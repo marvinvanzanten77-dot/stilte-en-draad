@@ -1,115 +1,67 @@
 import { useEffect, useRef, useState } from 'react'
 import VerticalNav from './components/VerticalNav'
 import ZoneContainer from './components/ZoneContainer'
+import Footer from './components/Footer'
+import LegalPage from './pages/LegalPage'
+import ProductPage from './pages/ProductPage'
+import { getProduct } from './data/products'
+import { ShopProvider } from './context/ShopContext'
+import { zones, type ZoneId } from './data/zones'
+import CookieConsent from './components/CookieConsent'
 
-export type ZoneId =
-  | 'de-eerste-draad'
-  | 'veld'
-  | 'droom'
-  | 'textiel'
-  | 'ritueel'
-  | 'stilte'
+const zoneIds = new Set(zones.map((zone) => zone.id))
+const pathForZone = (zone: ZoneId) => zone === 'de-eerste-draad' ? '/' : `/${zone}`
 
-const zones: { id: ZoneId; label: string }[] = [
-  { id: 'de-eerste-draad', label: 'DE EERSTE DRAAD' },
-  { id: 'veld', label: 'VELD' },
-  { id: 'droom', label: 'DROOM' },
-  { id: 'textiel', label: 'TEXTIEL' },
-  { id: 'ritueel', label: 'RITUEEL' },
-  { id: 'stilte', label: 'STILTE' },
-]
-
-function App() {
-  const [activeZone, setActiveZone] = useState<ZoneId>('de-eerste-draad')
+function AppContent() {
+  const [path, setPath] = useState(window.location.pathname)
   const [audioEnabled, setAudioEnabled] = useState(false)
+  const [volume, setVolume] = useState(0.55)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const firstSegment = path.split('/').filter(Boolean)[0]
+  const activeZone: ZoneId = zoneIds.has(firstSegment as ZoneId) ? firstSegment as ZoneId : 'de-eerste-draad'
+  const navigate = (nextPath: string) => { window.history.pushState({}, '', nextPath); setPath(nextPath); window.scrollTo({ top: 0, behavior: 'smooth' }) }
 
+  useEffect(() => { const onPopState = () => setPath(window.location.pathname); window.addEventListener('popstate', onPopState); return () => window.removeEventListener('popstate', onPopState) }, [])
   useEffect(() => {
-    if (!audioRef.current) {
-      const audio = new Audio('/audio/stilte-en-draad.wav')
-      audio.loop = true
-      audio.preload = 'auto'
-      audioRef.current = audio
-    }
-
+    if (!audioRef.current) { const audio = new Audio('/audio/stilte-en-draad.wav'); audio.loop = true; audio.preload = 'metadata'; audioRef.current = audio }
     const audio = audioRef.current
-    if (!audio) return
+    audio.volume = volume
+    if (audioEnabled) audio.play().catch(() => setAudioEnabled(false)); else audio.pause()
+  }, [audioEnabled, volume])
+  useEffect(() => () => audioRef.current?.pause(), [])
 
-    if (audioEnabled) {
-      audio
-        .play()
-        .catch(() => {
-          setAudioEnabled(false)
-        })
-    } else {
-      audio.pause()
+  const renderRoute = () => {
+    if (path === '/privacy') return <LegalPage type="privacy" />
+    if (path === '/algemene-voorwaarden') return <LegalPage type="terms" />
+    const [, routeType, slug] = path.split('/')
+    if ((routeType === 'werk' || routeType === 'certificaat') && slug) {
+      const product = getProduct(slug)
+      if (product) return <ProductPage product={product} navigate={navigate} certificate={routeType === 'certificaat'} />
     }
-  }, [audioEnabled])
-
-  useEffect(() => {
-    return () => {
-      audioRef.current?.pause()
-    }
-  }, [])
+    return <ZoneContainer activeZone={activeZone} navigate={navigate} />
+  }
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-8 px-6 py-10 md:flex-row md:gap-12">
-        <VerticalNav
-          zones={zones}
-          activeZone={activeZone}
-          onSelect={setActiveZone}
-        />
-        <div className="flex flex-1 flex-col gap-6">
+      <a href="#inhoud" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-neutral-900 focus:px-4 focus:py-2 focus:text-white">Naar inhoud</a>
+      <div className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 md:flex-row md:gap-10 md:py-10">
+        <VerticalNav zones={zones} activeZone={activeZone} onSelect={(zone) => navigate(pathForZone(zone))} navigate={navigate} />
+        <div className="min-w-0 flex flex-1 flex-col gap-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-            <header className="space-y-1 text-sm uppercase tracking-[0.24em] text-neutral-700">
-              <div className="font-semibold text-neutral-800">STILTE &amp; DRAAD</div>
-              <div className="text-xs font-normal text-neutral-600">door Jannie</div>
-            </header>
-
-            <button
-              type="button"
-              aria-pressed={audioEnabled}
-              onClick={() => setAudioEnabled((prev) => !prev)}
-              className="inline-flex items-center gap-3 self-start rounded-full border border-white/70 bg-white/70 px-3 py-2 text-[11px] uppercase tracking-[0.16em] text-neutral-700 shadow-soft/0 backdrop-blur-sm transition hover:-translate-y-[1px] hover:shadow-soft focus-visible:outline-none"
-            >
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-900 text-white">
-                {audioEnabled ? (
-                  <span className="flex gap-[4px]">
-                    <span className="block h-3.5 w-[3px] rounded-[1px] bg-white" />
-                    <span className="block h-3.5 w-[3px] rounded-[1px] bg-white" />
-                  </span>
-                ) : (
-                  <span
-                    aria-hidden="true"
-                    className="block"
-                    style={{
-                      width: 0,
-                      height: 0,
-                      borderTop: '6px solid transparent',
-                      borderBottom: '6px solid transparent',
-                      borderLeft: '9px solid white',
-                      marginLeft: '2px',
-                    }}
-                  />
-                )}
-              </span>
-              <span className="text-left leading-tight">
-                zet audio aan
-                <span className="block text-[10px] font-normal uppercase tracking-[0.12em] text-neutral-600">
-                  voor een betere ervaring
-                </span>
-              </span>
-            </button>
+            <button type="button" onClick={() => navigate('/')} className="space-y-1 self-start text-left text-sm uppercase tracking-[0.24em] text-neutral-700"><span className="block font-semibold text-neutral-800">STILTE &amp; DRAAD</span><span className="block text-xs font-normal text-neutral-600">door Jannie</span></button>
+            <div className="flex items-center gap-3 rounded-full border border-white/70 bg-white/65 px-3 py-2 backdrop-blur-sm">
+              <button type="button" aria-pressed={audioEnabled} onClick={() => setAudioEnabled((value) => !value)} className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-900 text-xs text-white" aria-label={audioEnabled ? 'Pauzeer audio' : 'Speel audio'}>{audioEnabled ? 'Ⅱ' : '▶'}</button>
+              <label className="flex items-center gap-2 text-[10px] uppercase tracking-[0.12em]"><span className="hidden sm:inline">Audio</span><input aria-label="Audiovolume" type="range" min="0" max="1" step="0.05" value={volume} onChange={(event) => setVolume(Number(event.target.value))} className="w-20 accent-neutral-900" /></label>
+            </div>
           </div>
-          <ZoneContainer
-            activeZone={activeZone}
-            onZoneChange={setActiveZone}
-          />
+          <main id="inhoud" tabIndex={-1}>{renderRoute()}</main>
+          <Footer navigate={navigate} />
         </div>
       </div>
+      <CookieConsent />
     </div>
   )
 }
 
+const App = () => <ShopProvider><AppContent /></ShopProvider>
 export default App

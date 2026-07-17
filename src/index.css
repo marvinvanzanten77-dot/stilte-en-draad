@@ -21,10 +21,29 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: radial-gradient(circle at 80% 10%, rgba(198, 169, 120, 0.12), transparent 30%);
+}
+
+button, input, select { font: inherit; }
+button { color: inherit; }
+:focus-visible { outline: 2px solid #5b4a35; outline-offset: 3px; }
+
+.thread-line {
+  opacity: 0.5;
+  background: radial-gradient(ellipse at center, transparent 48%, #c6a978 49%, #c6a978 49.6%, transparent 50.5%);
 }
 
 #root {
   min-height: 100vh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 a {

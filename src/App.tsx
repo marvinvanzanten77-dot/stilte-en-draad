@@ -8,6 +8,7 @@ import { getProduct } from './data/products'
 import { ShopProvider } from './context/ShopContext'
 import { zones, type ZoneId } from './data/zones'
 import CookieConsent from './components/CookieConsent'
+import { spokenWords } from './data/spokenWords'
 
 const zoneIds = new Set(zones.map((zone) => zone.id))
 const pathForZone = (zone: ZoneId) => zone === 'de-eerste-draad' ? '/' : `/${zone}`
@@ -23,11 +24,12 @@ function AppContent() {
 
   useEffect(() => { const onPopState = () => setPath(window.location.pathname); window.addEventListener('popstate', onPopState); return () => window.removeEventListener('popstate', onPopState) }, [])
   useEffect(() => {
-    if (!audioRef.current) { const audio = new Audio('/audio/stilte-en-draad.wav'); audio.loop = true; audio.preload = 'metadata'; audioRef.current = audio }
+    if (!audioRef.current) { const audio = new Audio(spokenWords['stilte-en-draad'].audioSrc); audio.loop = true; audio.preload = 'metadata'; audioRef.current = audio }
     const audio = audioRef.current
     audio.volume = volume
-    if (audioEnabled) audio.play().catch(() => setAudioEnabled(false)); else audio.pause()
+    if (audioEnabled) { window.dispatchEvent(new Event('stop-inline-audio')); audio.play().catch(() => setAudioEnabled(false)) } else audio.pause()
   }, [audioEnabled, volume])
+  useEffect(() => { const stop = () => setAudioEnabled(false); window.addEventListener('stop-main-audio', stop); return () => window.removeEventListener('stop-main-audio', stop) }, [])
   useEffect(() => () => audioRef.current?.pause(), [])
 
   const renderRoute = () => {

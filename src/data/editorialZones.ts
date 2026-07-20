@@ -8,6 +8,7 @@ export type EditorialZone = {
   heroAlt: string
   chapters: { number: string; title: string; prompt: string }[]
   audioLabel: string
+  spokenWordId?: 'de-eerste-draad' | 'de-laatste-draad'
   interactionTitle: string
   interactionText: string
   interactionType: 'portal' | 'field' | 'dream' | 'thread' | 'ritual' | 'silence'
@@ -19,7 +20,7 @@ export const editorialZones: Record<'de-eerste-draad' | 'veld' | 'droom' | 'text
   'de-eerste-draad': {
     eyebrow: 'De toegang', title: 'De Eerste Draad', question: 'Waarom zou ik binnenstappen?', coreLine: 'Alles begint met één draad.', introduction: 'Plaats hier later Jannies korte welkomstwoord: maximaal vijftig woorden over het begin van haar wereld.', heroImage: '/photos/jannie-2.jpg', heroAlt: 'Jannie als ingang tot het verhaal van Stilte & Draad',
     chapters: [{ number: '01', title: 'Het begin', prompt: 'Hoe begon Jannie met maken?' }, { number: '02', title: 'De draad', prompt: 'Wat betekent de draad in haar leven?' }, { number: '03', title: 'Stap binnen', prompt: 'Wat mag de bezoeker hier ontdekken?' }],
-    audioLabel: 'De Eerste Draad · spoken word', interactionTitle: 'De portalen openen', interactionText: 'Deze ruimte kan later de zones één voor één zichtbaar maken.', interactionType: 'portal', relatedProductSlug: 'zacht-begin', relatedProductTitle: 'Zacht Begin',
+    audioLabel: 'De Eerste Draad · spoken word', spokenWordId: 'de-eerste-draad', interactionTitle: 'De portalen openen', interactionText: 'Deze ruimte kan later de zones één voor één zichtbaar maken.', interactionType: 'portal', relatedProductSlug: 'zacht-begin', relatedProductTitle: 'Zacht Begin',
   },
   veld: {
     eyebrow: 'De oorsprong', title: 'Veld', question: 'Waar komt Jannie vandaan?', coreLine: 'Hier liggen de wortels van iedere draad.', introduction: 'Plaats hier later een korte introductie over landschap, jeugd, familie en de plekken die in Jannies werk voortleven.', heroImage: '/mood-board/Ethereal_Textile_Garden_Stillness.png', heroAlt: 'Een verstild textiellandschap als verbeelding van Jannies oorsprong',

@@ -67,7 +67,7 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
                 <span className="uppercase tracking-[0.14em] text-neutral-500">Totaal</span>
                 <strong>{formatPrice(cartTotal)}</strong>
               </div>
-              <button type="button" disabled className="mt-2 w-full cursor-not-allowed rounded-full bg-neutral-900/40 px-5 py-3 text-xs uppercase tracking-[0.16em] text-white">Afrekenen volgt</button>
+              <p className="mt-2 rounded-full border border-neutral-800/15 px-5 py-3 text-center text-xs uppercase tracking-[0.16em] text-neutral-600">Je selectie wordt op dit apparaat bewaard</p>
             </div>
           )}
         </aside>
@@ -87,7 +87,7 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
             </button>
           ))}
         </div>
-        <div className="mt-6 grid gap-2 rounded-xl border border-white/45 bg-white/20 p-4 text-center text-[10px] uppercase tracking-[0.13em] text-neutral-600 sm:grid-cols-3"><span>Unieke werken</span><span>Certificaat voorbereid</span><span>Veilige betaling volgt</span></div>
+        <div className="mt-6 grid gap-2 rounded-xl border border-white/45 bg-white/20 p-4 text-center text-[10px] uppercase tracking-[0.13em] text-neutral-600 sm:grid-cols-3"><span>Unieke werken</span><span>Handgemaakt door Jannie</span><span>Een verhaal bij ieder werk</span></div>
         <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto_auto]">
           <label><span className="sr-only">Zoek werken</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Zoek op titel of verhaal…" className="w-full rounded-full border border-neutral-800/15 bg-white/35 px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-neutral-700" /></label>
           <label><span className="sr-only">Sorteer werken</span><select value={sort} onChange={(event) => setSort(event.target.value as typeof sort)} className="h-full rounded-full border border-neutral-800/15 bg-white/35 px-4 text-xs uppercase tracking-[0.12em]"><option value="verhaal">Volgorde</option><option value="laag">Prijs laag–hoog</option><option value="hoog">Prijs hoog–laag</option></select></label>

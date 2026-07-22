@@ -14,6 +14,7 @@ const Evenementen = () => {
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [view, setView] = useState<'kalender' | 'lijst'>('kalender')
   const [eventType, setEventType] = useState<'Alles' | 'Festival' | 'Markt' | 'Expositie'>('Alles')
+  const [donationOpen, setDonationOpen] = useState(false)
 
   const calendar = useMemo(() => {
     const year = visibleMonth.getFullYear()
@@ -57,9 +58,15 @@ const Evenementen = () => {
             <h2 id="rijdende-atelier-title" className="mt-2 text-xl font-semibold uppercase tracking-[0.16em] sm:text-2xl">Het Rijdende Atelier</h2>
           </div>
         </div>
-        <div className="grid gap-5 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-7">
-          <div><p className="text-sm leading-7 text-neutral-700">Een toekomstidee waarin de werken, Jannies stem en de verhalen achter iedere draad samen naar festivals en markten reizen.</p><p className="mt-2 text-xs italic text-neutral-500">Luister naar het verhaal achter iedere draad.</p></div>
-          <a href="#agenda" className="rounded-full bg-neutral-900 px-5 py-3 text-center text-[10px] uppercase tracking-[0.15em] text-white">Waar strijken we neer? ↓</a>
+        <div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[1fr_280px] lg:items-stretch">
+          <div className="flex flex-col justify-center"><p className="text-sm leading-7 text-neutral-700">Een toekomstidee waarin de werken, Jannies stem en de verhalen achter iedere draad samen naar festivals en markten reizen.</p><p className="mt-2 text-xs italic text-neutral-500">Luister naar het verhaal achter iedere draad.</p><a href="#agenda" className="mt-5 self-start text-[9px] uppercase tracking-[0.15em] text-neutral-600 underline decoration-neutral-800/30 underline-offset-4">Waar strijken we neer? ↓</a></div>
+          <aside id="doneren" className="rounded-xl border border-[#9b7d4f]/25 bg-[#eee5d6]/70 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,.55)]" aria-labelledby="donation-title">
+            <p className="text-[9px] uppercase tracking-[0.18em] text-[#8a6b43]">Bouw mee aan het rijdende atelier</p>
+            <h3 id="donation-title" className="mt-2 text-sm font-semibold uppercase tracking-[0.13em]">Geef een draad mee</h3>
+            <p className="mt-3 text-xs leading-6 text-neutral-600">Jouw donatie gaat rechtstreeks naar de aanschaf van een bus en de verbouwing ervan tot het rijdende atelier van Stilte &amp; Draad. Zo kunnen Jannies werken, stem en verhalen straks naar festivals, markten en ontmoetingsplekken reizen.</p>
+            <button type="button" onClick={() => setDonationOpen(true)} aria-expanded={donationOpen} aria-controls="donation-message" className="mt-4 w-full rounded-full bg-[#2f2a24] px-5 py-3 text-[10px] uppercase tracking-[0.16em] text-white transition hover:bg-[#473d32]">Doneer aan het rijdende atelier ♥</button>
+            {donationOpen && <div id="donation-message" role="status" className="mt-4 border-t border-[#9b7d4f]/20 pt-4 text-xs leading-5 text-neutral-600"><strong className="font-medium text-neutral-700">Dank je dat je wilt meehelpen.</strong><br />Met jouw bijdrage komt de aanschaf en verbouwing van de bus een draad dichterbij. De veilige donatieverbinding wordt hier gekoppeld zodra de betaalpagina gereed is.</div>}
+          </aside>
         </div>
       </section>
 

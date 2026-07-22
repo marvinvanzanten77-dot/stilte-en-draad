@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { formatPrice, productImage, products, type Product } from '../data/products'
 import { useShop } from '../context/ShopContext'
 
@@ -6,7 +5,6 @@ type ProductPageProps = { product: Product; navigate: (path: string) => void; ce
 
 const ProductPage = ({ product, navigate, certificate = false }: ProductPageProps) => {
   const { cart, favorites, toggleCart, toggleFavorite } = useShop()
-  useEffect(() => { document.title = `${product.title} · Stilte & Draad` }, [product])
   if (certificate) return (
     <article className="relative overflow-hidden rounded-2xl border border-[#c6a978] bg-[#f8f4ec] p-8 text-center shadow-soft md:p-14">
       <div aria-hidden="true" className="thread-line absolute -left-20 top-0 h-full w-48" />

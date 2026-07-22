@@ -8,7 +8,8 @@ export type EditorialZone = {
   heroAlt: string
   chapters: { number: string; title: string; prompt: string }[]
   audioLabel: string
-  spokenWordId?: 'de-eerste-draad' | 'stilte-en-draad' | 'de-laatste-draad'
+  readingText?: string
+  spokenWordId?: 'de-eerste-draad' | 'stilte-en-draad' | 'stilte' | 'de-laatste-draad'
   interactionTitle: string
   interactionText: string
   interactionType: 'portal' | 'field' | 'dream' | 'thread' | 'ritual' | 'silence'
@@ -35,11 +36,11 @@ export const editorialZones: Record<'de-eerste-draad' | 'veld' | 'droom' | 'ritu
   ritueel: {
     eyebrow: 'Het ritme', title: 'Ritueel', question: 'Welke handelingen geven betekenis?', coreLine: 'Het werk begint voordat de eerste steek wordt gemaakt.', introduction: 'Ik ga zitten, leg de materialen voor mij neer en maak ruimte voor wat wil ontstaan. Dan begint het ritme: kijken, voelen, maken en opnieuw kijken. Niet om sneller klaar te zijn, maar om dichter te komen bij wat het werk wil zeggen.', heroImage: '/mood-board/Golden_Atelier_Morning.png', heroAlt: 'Warm ochtendlicht in een rustig atelier',
     chapters: [{ number: '01', title: 'Voorbereiden', prompt: 'Eerst vertraag ik. Ik leg klaar wat ik nodig heb en laat de druk om het eind al te kennen los.' }, { number: '02', title: 'Herhalen', prompt: 'In de terugkerende beweging worden mijn handen stil en hoor ik beter welke kant de draad op wil.' }, { number: '03', title: 'Overdragen', prompt: 'Wanneer een werk vertrekt, geef ik niet alleen materiaal door. Ik geef iets mee van de weg die ik erin heb afgelegd.' }],
-    audioLabel: 'Het ritme van de werktafel', interactionTitle: 'Vier handelingen', interactionText: 'Zitten, maken, kijken en geven. Het zijn eenvoudige handelingen, maar door aandacht worden ze een ritueel.', interactionType: 'ritual', relatedProductSlug: 'aan-de-tak', relatedProductTitle: 'Aan de Tak',
+    audioLabel: 'Het ritme van de werktafel', readingText: 'Lang voor onze tijd gaven volkeren uit de oudheid met rituelen betekenis aan geboorte, oogst, verlies, verandering en een nieuw begin. Toch hoeft een ritueel niet groots, mystiek of uitgesproken spiritueel te zijn. Het kan juist eenvoudig en aards zijn: gaan zitten, de materialen klaarleggen, een kaars aansteken of met aandacht de eerste draad kiezen. Het verschil tussen een gewoonte en een ritueel zit niet in de handeling, maar in het bewustzijn waarmee je haar uitvoert. Een gewoonte gebeurt vanzelf. Een ritueel vraagt je om werkelijk aanwezig te zijn.', interactionTitle: 'De aandacht blijft', interactionText: 'Oude en moderne handelingen spiegelen elkaar. De tijd en de vorm veranderen, maar wanneer wij bewust aanwezig zijn, krijgt het alledaagse opnieuw betekenis.', interactionType: 'ritual', relatedProductSlug: 'aan-de-tak', relatedProductTitle: 'Aan de Tak',
   },
   stilte: {
     eyebrow: 'De ademruimte', title: 'Stilte', question: 'Wat blijft wanneer het maken stopt?', coreLine: 'Stilte is de ruimte waarin een nieuwe draad kan beginnen.', introduction: 'Na ieder einde is het even stil. Geen leegte die gevuld moet worden, maar ruimte om te horen wat het leven terugzegt. Misschien klinkt daar de inspiratie voor een nieuw begin. Misschien gewoon stilte.', heroImage: '/mood-board/Golden_Atelier_Morning.png', heroAlt: 'Een stil atelier in zacht gouden licht',
     chapters: [{ number: '01', title: 'Stoppen', prompt: 'Eindigen is toegeven dat iets goed genoeg mag zijn. Mijn handen vallen stil en de draad laat mij los.' }, { number: '02', title: 'Kijken', prompt: 'Pas op afstand zie ik wat al die afzonderlijke keuzes samen zijn geworden.' }, { number: '03', title: 'Opnieuw', prompt: 'In de stilte wordt altijd weer iets nieuws geboren. Eerst een gedachte. Dan een eerste draad.' }],
-    audioLabel: 'Stilte & Draad', interactionTitle: 'Blijf nog even', interactionText: 'Niets hoeft hier opgelost of afgemaakt te worden. Adem, kijk en laat de stilte even spreken.', interactionType: 'silence', relatedProductSlug: 'nachtgetij', relatedProductTitle: 'Nachtgetij',
+    audioLabel: 'Stilte · spoken word', spokenWordId: 'stilte', interactionTitle: 'Dertig seconden ruimte', interactionText: 'Geen opdracht en geen geluid dat iets voor je invult. Alleen een korte, bewuste stilte om op te merken wat er al is.', interactionType: 'silence', relatedProductSlug: 'nachtgetij', relatedProductTitle: 'Nachtgetij',
   },
 }

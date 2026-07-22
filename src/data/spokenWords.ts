@@ -1,4 +1,4 @@
-export type SpokenWordId = 'de-eerste-draad' | 'stilte-en-draad' | 'de-laatste-draad'
+export type SpokenWordId = 'de-eerste-draad' | 'stilte-en-draad' | 'stilte' | 'de-laatste-draad'
 
 export type SpokenWord = {
   id: SpokenWordId
@@ -82,6 +82,38 @@ dan passeert het leven aan je voorbij.
 Stilte en draad.
 Stilte en draad.
 Stilte en draad.`,
+  },
+  stilte: {
+    id: 'stilte', title: 'Stilte', audioSrc: '/audio/stilte.mp3', status: 'verified',
+    lyrics: `Stilte.
+De ruimte waarin tijd even niet hoeft te bestaan.
+Soms is het de stilte van een plek zonder geluid of afleiding,
+een leeg bos, een kamer zonder echo.
+Soms is het de stilte midden in de drukte en de chaos,
+
+De innerlijke stilte is krachtiger, confronterender dan alle stilte om ons heen.
+Ze vraagt niets, maar eist alles.
+Ze confronteert je met wat er écht leeft onder het lawaai van gedachten, ambities en identiteit.
+Ze is geen afwezigheid van geluid, maar de aanwezigheid van iets groters.
+Stilte bestaat overal.
+Zij heeft geen menselijke blik nodig om te bestaan,
+slechts een luisterend oor om gehoord te worden.
+Want ook stilte kan spreken — soms harder dan het geluid.
+Als een oude radiozender die altijd uitzendt op dezelfde frequentie,
+wachtend tot iemand de knop draait en eindelijk ontvangt.
+Het is de plek waar ideeën en dromen mogen ademen,
+waar ze zich durven uit te strekken zonder meteen gevangen te worden in woorden of daden.
+De plek waar de dunne, zilveren draad zichtbaar wordt,
+als je ophoudt met praten en haar laat leiden.
+Stilte.
+Zij komt ook na alle bewondering,
+na het applaus, de lichten en de complimenten.
+Altijd met dezelfde rustige toon en diepte,
+maar nooit in dezelfde woorden.
+Zacht, onvermijdelijk.
+Alsof ze fluistert:
+“Alles wat je zojuist was… mag je nu weer loslaten.”
+En in dat loslaten bestaan wij meer dan in het vasthouden— eeuwig, geduldig, vol.`,
   },
   'de-laatste-draad': {
     id: 'de-laatste-draad', title: 'De Laatste Draad', audioSrc: '/audio/de-laatste-draad.mp3', status: 'verified',

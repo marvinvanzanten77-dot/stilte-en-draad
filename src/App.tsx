@@ -19,6 +19,17 @@ function AppContent() {
   const navigate = (nextPath: string) => { window.history.pushState({}, '', nextPath); setPath(nextPath); window.scrollTo({ top: 0, behavior: 'smooth' }) }
 
   useEffect(() => { const onPopState = () => setPath(window.location.pathname); window.addEventListener('popstate', onPopState); return () => window.removeEventListener('popstate', onPopState) }, [])
+  useEffect(() => {
+    if (path === '/privacy') { document.title = 'Privacy · Stilte & Draad'; return }
+    if (path === '/algemene-voorwaarden') { document.title = 'Algemene voorwaarden · Stilte & Draad'; return }
+    const [, routeType, slug] = path.split('/')
+    if ((routeType === 'werk' || routeType === 'certificaat') && slug) {
+      const product = getProduct(slug)
+      if (product) { document.title = `${product.title} · Stilte & Draad`; return }
+    }
+    const zoneTitle = zones.find((zone) => zone.id === activeZone)?.label.toLocaleLowerCase('nl-NL').replace(/(^|\s)\S/g, (letter) => letter.toUpperCase())
+    document.title = `${zoneTitle ?? 'Stilte & Draad'} · Stilte & Draad`
+  }, [activeZone, path])
 
   const renderRoute = () => {
     if (path === '/privacy') return <LegalPage type="privacy" />

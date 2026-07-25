@@ -15,9 +15,39 @@ type Memory = {
 }
 
 const memories: Memory[] = [
-  { id: 'utrecht', country: 'Nederland', place: 'Utrecht', x: 47, y: 24, accent: '#9b6b45', title: 'Waar het begon', text: 'Een geboorteplaats blijft soms als een stille onderlaag aanwezig, ook wanneer het leven verder trekt.', transcript: `Ik kwam ter wereld tussen steen, water en stemmen.\nNog voordat ik wist wat herinneren was,\nlegde Utrecht een eerste draad in mij.\n\nSommige plekken verlaat je.\nAndere plekken reizen stil met je mee.` },
-  { id: 'zeist', country: 'Nederland', place: 'Zeist', x: 47, y: 24, accent: '#6f7957', title: 'Tussen bomen', text: 'In het groen wordt het tempo zachter en krijgen gedachten de ruimte om een vorm te zoeken.', transcript: `Onder de bomen hoefde niets meteen af.\nHet licht verschoof, de middag werd avond,\nen mijn handen leerden wachten.\n\nWat langzaam groeit,\nwortelt vaak het diepst.` },
-  { id: 'ijzendoorn', country: 'Nederland', place: 'IJzendoorn', x: 47, y: 24, accent: '#b78a42', title: 'Langs de rivier', text: 'Water, dijken en open lucht bewaren een ander soort stilte: breed, aards en altijd in beweging.', transcript: `De rivier kent geen rechte draad.\nZij buigt om wat zij tegenkomt\nen blijft toch onderweg.\n\nMisschien maak ik daarom zoals water stroomt:\nniet volgens een plan, maar volgens het landschap.` },
+  { id: 'utrecht', country: 'Nederland', place: 'Utrecht', x: 47, y: 24, accent: '#9b6b45', title: 'Waar mijn leven begon', text: 'Utrecht is de plek waar ik als gevoelig meisje opgroeide, moeder werd en uiteindelijk besloot mijn eigen leven werkelijk aan te gaan.', transcript: `Ik ben 71 jaar geleden geboren in een klein steegje aan de Westerkade in Utrecht. Als klein meisje trok ik veel op met een vriend uit de buurt. Ook was ik vaak te vinden bij tantes, neven en andere kinderen thuis.
+
+Bij ons thuis heerste, vooral door mijn vader, veel discipline. Ik was juist een vrij kind dat wilde spelen, ontdekken en beleven. Daarom kwam ik graag bij gezinnen waar het wat losser en ongedwongener was.
+
+Toen ik zes jaar was, verhuisden we naar de Roerstraat. Daar heb ik het grootste deel van mijn jeugd doorgebracht. Van de vier kinderen was ik het gevoelige en kwetsbare type. Ik was graag op mezelf, schuchter en verlegen. Veel van wat ik voelde, hield ik binnen.
+
+Ik bleef in de Roerstraat wonen tot ik trouwde met de vader van mijn oudste kind, mijn dochter Josien. Dat huwelijk duurde vijf jaar. We pasten niet bij elkaar. Ik voelde mij niet gezien en kon binnen die relatie steeds minder mezelf zijn. Hij richtte zich vooral op zijn werk, terwijl ik behoefte had aan warmte, nabijheid en samen leven.
+
+Na het einde van dat huwelijk begon mijn vrije periode. Het werd een ontdekkingsreis waarin ik langzaam losbrak van het onzekere en verlegen meisje dat ik altijd was geweest. Ik besloot het leven niet langer vanaf de zijlijn te bekijken, maar het werkelijk aan te gaan — met alles wat mooi, moeilijk en onverwacht kon zijn.
+
+In die periode ontmoette ik de vader van mijn twee zoons. Eerst werd Marvin geboren en daarna Melton, mijn jongste. Uiteindelijk kwamen we terecht in een huis in Hoograven. Dat werd de plek waar wij samenwoonden en waar onze kinderen als gezin verder opgroeiden.
+
+Utrecht is daardoor niet één herinnering of één huis. Het is de plek waar ik als gevoelig meisje begon, waar ik moeder werd en waar ik voor het eerst bewust koos om mijn eigen leven te leiden.`, videoSrc: '/videos/kaart/utrecht.mp4' },
+  { id: 'zeist', country: 'Nederland', place: 'Zeist', x: 47, y: 24, accent: '#6f7957', title: 'Opnieuw ruimte voor mijzelf', text: 'In Zeist veranderde mijn rol binnen de familie. Na jaren intensief zorgen ontstond er opnieuw ruimte om dichter bij mijzelf te komen en mijn eigen leven vorm te geven.', transcript: `Toen mijn kinderen oud genoeg waren om op zichzelf te wonen, verhuisde ik naar een rustigere en intiemere plek in Zeist. Mijn dochter woonde met haar twee kinderen in hetzelfde gebouw. Dat maakte de afstand tussen ons klein, niet alleen letterlijk, maar ook in ons dagelijks leven.
+
+Omdat de vader van haar kinderen niet aanwezig was, speelde ik tijdens hun eerste jaren een grote rol in de verzorging en opvoeding. Ik was veel bij hen en mocht hun ontwikkeling van heel dichtbij meemaken. Ook zag ik hoe mijn dochter groeide in haar rol als moeder. Die periode heeft ons bijzonder hecht gemaakt en ik ben dankbaar dat ik zoveel van hun jonge leven heb mogen delen.
+
+Later kreeg mijn dochter een nieuwe partner. Als moeder en grootmoeder vond ik het niet altijd eenvoudig om mijn positie binnen het gezin te zien veranderen. De plek die jarenlang zo vanzelfsprekend had gevoeld, kreeg een andere vorm. Toch bracht die verandering mij ook iets waardevols: de kans om weer dichter bij mijzelf te komen en mijn eigen leven opnieuw invulling te geven.
+
+In Zeist nam ik een Jack Russell in huis. Ze heette Dushi. Met haar kwam er opnieuw beweging en gezelschap in een huis dat plotseling leger en stiller voelde. Dankzij haar bleef ik naar buiten gaan en ontstonden er onderweg vanzelf kleine contacten met andere mensen.
+
+Mijn twee zoons woonden allebei nog in Utrecht. Zij waren druk bezig hun eigen weg te vinden. Zo ging ieder van ons steeds meer een eigen richting op. Voor mij werd Zeist de plek waar zorgen voor anderen langzaam weer plaats mocht maken voor aandacht voor mijn eigen leven.`, videoSrc: '/videos/kaart/zeist.mp4' },
+  { id: 'ijzendoorn', country: 'Nederland', place: 'IJzendoorn', x: 47, y: 24, accent: '#b78a42', title: 'Waar ik de draad terugvond', text: 'In IJzendoorn leerde ik de stilte niet langer als leegte te zien. Hier ontdekte ik opnieuw dat ik een maker ben en vond de beweging van mijn leven een plek in mijn handen.', transcript: `Ik woon nu zeven jaar in IJzendoorn. Misschien een vreemde keuze voor een vrouw die altijd van het bruisende leven heeft gehouden: salsa, dansen, feesten, flirten en avontuur.
+
+Blijkbaar werd ook ik ouder. Niet per se saaier, maar wel uitgekeken op het idee dat ik het leven altijd buiten mijzelf moest zoeken. Ik koos voor een plek waar ik nog sterker met de leegte en de stilte werd geconfronteerd. Voor het eerst woonde ik niet meer in de buurt van mijn kinderen. Ik verruilde de hele regio Utrecht voor een klein dorp in de Betuwe. Helemaal alleen was ik niet; in het nabijgelegen Tiel woont nog een zus van mij.
+
+De coronaperiode bracht mij nog verder naar binnen. Gek genoeg ben ik daar achteraf dankbaar voor. In die tijd maakte ik kennis met een nieuwe kant van mijzelf: een stillere, wijzere en stabielere vrouw, die niet voortdurend iets buiten zichzelf nodig had om te voelen dat zij leefde.
+
+Tijdens een cursus leerde ik haken. Daarmee leerde ik ook om werkelijk stil te zitten. Terwijl mijn handen bezig waren, herontdekte ik iets wat altijd al in mij had gezeten: ik ben een maker. Iemand die iets in beweging moet zetten.
+
+Vroeger bracht ik vooral de mensen om mij heen in beweging, met mijn humor, gastvrijheid, energie en passie. In IJzendoorn begon ik de draad in beweging te brengen. Steek voor steek ontstonden kleuren, vormen en verhalen onder mijn handen.
+
+Misschien was dit wel de rode draad die ik mijn hele leven in de buitenwereld had gezocht. Niet iets wat ik nog hoefde te vinden, maar iets wat al die tijd in mij aanwezig was en alleen op voldoende stilte had gewacht om zichtbaar te worden.`, videoSrc: '/videos/kaart/ijzendoorn.mp4' },
   { id: 'marokko', country: 'Marokko', x: 44, y: 48, accent: '#b56b45', title: 'Kleur die blijft', text: 'Warmte, patronen en verzadigde kleuren vonden een weg terug naar het atelier.', transcript: `Rood in de aarde.\nBlauw waar schaduw valt.\nGoud in het laatste licht.\n\nIk nam niets mee behalve kijken,\nmaar thuis bleken mijn handen\nde kleuren nog te kennen.` },
   { id: 'suriname', country: 'Suriname', x: 27, y: 64, accent: '#657750', title: 'Groen in vele lagen', text: 'Een landschap waarin alles groeit, klinkt en door elkaar heen beweegt.', transcript: `Het groen was nooit één kleur.\nIedere laag droeg een ander licht,\neen ander geluid, een ander verhaal.\n\nSindsdien weet ik:\novervloed hoeft niet luid te zijn.` },
   { id: 'griekenland', country: 'Griekenland', x: 59, y: 40, accent: '#58778b', title: 'Licht op steen', text: 'Helder licht en oude vormen maken zichtbaar hoe schoonheid en slijtage naast elkaar bestaan.', transcript: `Witte muren hielden het zonlicht vast.\nStenen droegen sporen van handen\ndie ik nooit heb gekend.\n\nNiets blijft ongeschonden.\nJuist daarin wordt een oppervlak een verhaal.` },
@@ -75,6 +105,7 @@ const VeldExperience = () => {
         <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">Ontdek</p>
         <h2 className="mt-3 text-lg font-semibold uppercase tracking-[0.14em]">Herinneringen op de kaart</h2>
         <p className="mt-3 max-w-xl text-sm leading-6 text-neutral-600">Kies een plek en luister naar het verhaal dat daar is achtergebleven. Nederland opent drie kleinere draden.</p>
+        <p className="sr-only">De kaart bevat verhalen uit Utrecht, Zeist, IJzendoorn, Marokko, Suriname, Griekenland en Ibiza. Alle plekken zijn als knoppen met het toetsenbord te openen.</p>
 
         <div ref={mapRef} onClick={() => setNetherlandsOpen(false)} className="relative mt-6 overflow-hidden rounded-2xl border border-white/55 bg-[#cbbda4]/45 shadow-[inset_0_2px_12px_rgba(71,61,47,.22),0_12px_28px_rgba(84,68,48,.14)]">
           <svg viewBox="0 0 760 390" className="block w-full" role="img" aria-label="Gestileerde wereldkaart met herinneringsplekken">
@@ -122,7 +153,7 @@ const VeldExperience = () => {
         </header>
         <div className="grid gap-6 p-6 sm:grid-cols-[1.08fr_.92fr]">
           <div>
-            {active.videoSrc ? <video controls preload="metadata" src={active.videoSrc} className="aspect-video w-full rounded-xl bg-neutral-900 object-cover" /> : <div className="flex aspect-video flex-col items-center justify-center rounded-xl bg-[#39342e] text-[#eee5d6] shadow-inner"><span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/50 pl-0.5 text-sm">▶</span><span className="mt-3 text-[8px] uppercase tracking-[0.2em] text-white/60">Filmfragment volgt</span></div>}
+            {active.videoSrc ? <video controls muted playsInline preload="metadata" src={active.videoSrc} onVolumeChange={(event) => { event.currentTarget.muted = true }} aria-label={`Stille video-impressie van ${active.place ?? active.country}`} className="aspect-video w-full rounded-xl bg-neutral-900 object-cover" /> : <div className="flex aspect-video flex-col items-center justify-center rounded-xl bg-[#39342e] text-[#eee5d6] shadow-inner"><span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/50 pl-0.5 text-sm">▶</span><span className="mt-3 text-[8px] uppercase tracking-[0.2em] text-white/60">Filmfragment volgt</span></div>}
             <p className="mt-4 text-sm leading-6 text-neutral-600">{active.text}</p>
             <div className="mt-5 rounded-xl border border-[#9b7d4f]/25 bg-white/35 p-4">
               <p className="mb-3 text-[8px] uppercase tracking-[0.18em] text-neutral-500">Gesproken woord</p>

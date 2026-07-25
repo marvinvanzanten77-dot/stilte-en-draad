@@ -8,7 +8,7 @@ type DreamCard = {
   invitation: string
 }
 
-const dreamCards: DreamCard[] = [
+const dreamCardEntries: DreamCard[] = [
   { id: 'eerste-stap', title: 'De Eerste Stap', image: '/droomkaarten/01-de-eerste-stap.png', meaning: 'Je hoeft de hele weg nog niet te kunnen zien. Een droom wordt werkelijk zodra je haar een kleine plaats in je dag geeft.', invitation: 'Besteed vandaag tien minuten aan datgene wat je steeds uitstelt.' },
   { id: 'open-deur', title: 'De Open Deur', image: '/droomkaarten/02-de-open-deur.png', meaning: 'Niet alles achter de drempel hoeft al bekend te zijn. Nieuwsgierigheid kan voldoende zijn om verder te gaan.', invitation: 'Zeg vandaag eenmaal ja tegen iets wat je normaal uit onzekerheid vermijdt.' },
   { id: 'eigen-stem', title: 'De Eigen Stem', image: '/droomkaarten/03-de-eigen-stem.png', meaning: 'Wat alleen jij kunt maken, ontstaat pas wanneer jouw eigen stem meer ruimte krijgt dan de verwachtingen om je heen.', invitation: 'Schrijf in één zin op wat jij werkelijk wilt maken of beleven.' },
@@ -22,6 +22,7 @@ const dreamCards: DreamCard[] = [
   { id: 'medereiziger', title: 'De Medereiziger', image: '/droomkaarten/11-de-medereiziger.png', meaning: 'Je hoeft een droom niet alleen te dragen. De juiste verbinding maakt jouw richting niet minder persoonlijk, maar sterker.', invitation: 'Vertel één vertrouwd persoon welke droom je graag meer ruimte wilt geven.' },
   { id: 'nieuw-begin', title: 'Het Nieuwe Begin', image: '/droomkaarten/12-het-nieuwe-begin.png', meaning: 'Ieder begin mag klein zijn. Groei ontstaat niet uit zekerheid, maar uit aandacht voor wat voorzichtig naar het licht beweegt.', invitation: 'Kies vóór het einde van vandaag één zichtbare eerste handeling.' },
 ]
+const dreamCards = dreamCardEntries.map((card) => ({ ...card, image: card.image.replace('.png', '.jpg') }))
 
 const DreamCards = () => {
   const [selected, setSelected] = useState<DreamCard | null>(null)
@@ -34,7 +35,7 @@ const DreamCards = () => {
   }, [selected])
 
   return <div className="relative overflow-hidden rounded-2xl border border-white/50 bg-[#c9b99d]/40 p-4 shadow-inner sm:p-5">
-    <div className="grid grid-cols-6 gap-2 sm:gap-3" aria-label="Twaalf gedekte droomkaarten">
+    <p className="sr-only">Er liggen twaalf gedekte droomkaarten. Iedere knop trekt één kaart en opent de titel, betekenis en een kleine uitnodiging voor vandaag.</p><div className="grid grid-cols-6 gap-2 sm:gap-3" aria-label="Twaalf gedekte droomkaarten">
       {dreamCards.map((card, index) => <button key={card.id} type="button" onClick={() => setSelected(card)} aria-label={`Trek droomkaart ${index + 1}`} className="group relative aspect-[2/3] overflow-hidden rounded-md border border-[#8f7048]/35 bg-[#a77b50] shadow-[0_4px_8px_rgba(65,46,29,.22)] transition duration-300 hover:-translate-y-1 hover:rotate-0 hover:shadow-[0_8px_15px_rgba(65,46,29,.3)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6f5136]" style={{ transform: `rotate(${(index % 3 - 1) * 1.5}deg)` }}>
         <span className="absolute inset-1 rounded-[3px] border border-[#ead8b5]/55" />
         <span className="absolute inset-[18%] rotate-45 rounded-sm border border-[#ead8b5]/45" />
@@ -53,7 +54,7 @@ const DreamCards = () => {
           <p className="mt-3 text-xs leading-5 text-neutral-600 sm:text-sm sm:leading-6">{selected.meaning}</p>
           <div className="mt-3 border-l border-[#9b7d4f]/55 pl-3"><p className="text-[7px] uppercase tracking-[0.17em] text-neutral-500">Vandaag</p><p className="mt-1.5 font-serif text-xs leading-5 text-neutral-700 sm:text-sm">{selected.invitation}</p></div>
           <button type="button" onClick={() => setSelected(null)} className="mt-4 self-start rounded-full border border-neutral-800/20 px-3 py-2 text-[8px] uppercase tracking-[0.14em] transition hover:bg-white/60">Leg terug en kies opnieuw</button>
-        </div>
+    </div>
       </div>
     </div>}
   </div>

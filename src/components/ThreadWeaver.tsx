@@ -119,6 +119,7 @@ const ThreadWeaver = () => {
 
   return (
     <div className="overflow-hidden rounded-[1.4rem] border border-[#8c6b43]/25 bg-[#b78e5c] p-2 shadow-[0_16px_35px_rgba(71,51,31,.18),inset_0_1px_0_rgba(255,255,255,.45)]">
+      <p className="sr-only">Interactieve weefervaring met twaalf punten in twee zeshoeken. Kies een kleur en verbind punten met de aanwijzer. De bediening eronder toont het aantal gemaakte draadgangen en laat de laatste draad verwijderen.</p>
       <div className="relative">
         <svg
           ref={svgRef}

@@ -5,6 +5,9 @@ const months = [
   'juli', 'augustus', 'september', 'oktober', 'november', 'december',
 ]
 const weekdays = ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo']
+const fullDate = (year: number, month: number, day: number) =>
+  new Intl.DateTimeFormat('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+    .format(new Date(year, month, day))
 
 const Evenementen = () => {
   const today = new Date()
@@ -95,6 +98,7 @@ const Evenementen = () => {
                   type="button"
                   onClick={() => setSelectedDay(day)}
                   aria-pressed={selectedDay === day}
+                  aria-label={`${fullDate(visibleMonth.getFullYear(), visibleMonth.getMonth(), day)}${isToday(day) ? ', vandaag' : ''}; geen evenement gepland`}
                   className={`aspect-square rounded-full text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-700 ${
                     selectedDay === day
                       ? 'bg-neutral-900 text-white'

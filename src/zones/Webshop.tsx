@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { formatPrice, productCategories as categories, productThumbnail, products } from '../data/products'
 import { useShop } from '../context/ShopContext'
 
@@ -8,7 +8,33 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<'verhaal' | 'laag' | 'hoog'>('verhaal')
   const [favoritesOnly, setFavoritesOnly] = useState(false)
+  const cartDialogRef = useRef<HTMLElement>(null)
+  const cartButtonRef = useRef<HTMLButtonElement>(null)
   const { cart, favorites, toggleCart, toggleFavorite, clearCart } = useShop()
+
+  useEffect(() => {
+    if (!cartOpen) return
+    const previousFocus = document.activeElement as HTMLElement | null
+    cartDialogRef.current?.querySelector<HTMLElement>('button')?.focus()
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setCartOpen(false)
+        return
+      }
+      if (event.key !== 'Tab' || !cartDialogRef.current) return
+      const focusable = [...cartDialogRef.current.querySelectorAll<HTMLElement>('button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled)')]
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable.at(-1)!
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      ;(previousFocus ?? cartButtonRef.current)?.focus()
+    }
+  }, [cartOpen])
 
   const visibleProducts = useMemo(
     () => products
@@ -33,6 +59,7 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
           </p>
         </div>
         <button
+          ref={cartButtonRef}
           type="button"
           onClick={() => setCartOpen((open) => !open)}
           aria-expanded={cartOpen}
@@ -44,10 +71,10 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
       </header>
 
       {cartOpen && (
-        <aside className="border-b border-neutral-800/10 bg-white/25 px-7 py-6 md:px-10" aria-label="Winkelmand">
+        <aside ref={cartDialogRef} className="border-b border-neutral-800/10 bg-white/25 px-7 py-6 md:px-10" role="dialog" aria-modal="true" aria-labelledby="cart-title">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em]">Jouw gekozen werken</p>
-            {cart.length > 0 && <button type="button" onClick={clearCart} className="text-[10px] uppercase tracking-[0.14em] text-neutral-500 underline underline-offset-4">Maak leeg</button>}
+            <p id="cart-title" className="text-xs font-semibold uppercase tracking-[0.16em]">Jouw gekozen werken</p>
+            <div className="flex items-center gap-3">{cart.length > 0 && <button type="button" onClick={clearCart} className="text-[10px] uppercase tracking-[0.14em] text-neutral-500 underline underline-offset-4">Maak leeg</button>}<button type="button" onClick={() => setCartOpen(false)} aria-label="Sluit winkelmand" className="flex h-8 w-8 items-center justify-center rounded-full border border-neutral-800/15 text-lg">×</button></div>
           </div>
           {cart.length === 0 ? (
             <p className="mt-2 text-sm text-neutral-600">Je winkelmand is nog leeg.</p>

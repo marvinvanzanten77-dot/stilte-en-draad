@@ -11,6 +11,17 @@ import CookieConsent from './components/CookieConsent'
 
 const zoneIds = new Set(zones.map((zone) => zone.id))
 const pathForZone = (zone: ZoneId) => zone === 'de-eerste-draad' ? '/' : `/${zone}`
+const siteUrl = 'https://www.stilte-en-draad.nl'
+const defaultDescription = 'Autobiografische textielkunst, verhalen en spoken word van Jannie van Zanten.'
+
+const setMeta = (selector: string, attributes: Record<string, string>) => {
+  let element = document.head.querySelector<HTMLMetaElement>(selector)
+  if (!element) {
+    element = document.createElement('meta')
+    document.head.appendChild(element)
+  }
+  Object.entries(attributes).forEach(([key, value]) => element!.setAttribute(key, value))
+}
 
 function AppContent() {
   const [path, setPath] = useState(window.location.pathname)
@@ -20,15 +31,64 @@ function AppContent() {
 
   useEffect(() => { const onPopState = () => setPath(window.location.pathname); window.addEventListener('popstate', onPopState); return () => window.removeEventListener('popstate', onPopState) }, [])
   useEffect(() => {
-    if (path === '/privacy') { document.title = 'Privacy · Stilte & Draad'; return }
-    if (path === '/algemene-voorwaarden') { document.title = 'Algemene voorwaarden · Stilte & Draad'; return }
+    let title = 'Stilte & Draad · door Jannie'
+    let description = defaultDescription
+    let image = `${siteUrl}/mood-board/Golden_Atelier_Morning.png`
     const [, routeType, slug] = path.split('/')
+    if (path === '/privacy') title = 'Privacy · Stilte & Draad'
+    else if (path === '/algemene-voorwaarden') title = 'Algemene voorwaarden · Stilte & Draad'
     if ((routeType === 'werk' || routeType === 'certificaat') && slug) {
       const product = getProduct(slug)
-      if (product) { document.title = `${product.title} · Stilte & Draad`; return }
+      if (product) {
+        title = `${product.title} · Stilte & Draad`
+        description = `${product.description} Handgemaakt, uniek werk van Jannie van Zanten.`
+        image = `${siteUrl}/products/${product.id}.jpg`
+      }
+    } else if (path !== '/privacy' && path !== '/algemene-voorwaarden') {
+      const zoneTitle = zones.find((zone) => zone.id === activeZone)?.label.toLocaleLowerCase('nl-NL').replace(/(^|\s)\S/g, (letter) => letter.toUpperCase())
+      title = `${zoneTitle ?? 'Stilte & Draad'} · Stilte & Draad`
     }
-    const zoneTitle = zones.find((zone) => zone.id === activeZone)?.label.toLocaleLowerCase('nl-NL').replace(/(^|\s)\S/g, (letter) => letter.toUpperCase())
-    document.title = `${zoneTitle ?? 'Stilte & Draad'} · Stilte & Draad`
+
+    document.title = title
+    const canonicalUrl = `${siteUrl}${path === '/' ? '' : path}`
+    let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+    if (!canonical) {
+      canonical = document.createElement('link')
+      canonical.rel = 'canonical'
+      document.head.appendChild(canonical)
+    }
+    canonical.href = canonicalUrl
+    setMeta('meta[name="description"]', { name: 'description', content: description })
+    setMeta('meta[property="og:title"]', { property: 'og:title', content: title })
+    setMeta('meta[property="og:description"]', { property: 'og:description', content: description })
+    setMeta('meta[property="og:type"]', { property: 'og:type', content: routeType === 'werk' ? 'product' : 'website' })
+    setMeta('meta[property="og:url"]', { property: 'og:url', content: canonicalUrl })
+    setMeta('meta[property="og:image"]', { property: 'og:image', content: image })
+    setMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' })
+    setMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: title })
+    setMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description })
+    setMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: image })
+
+    document.getElementById('product-structured-data')?.remove()
+    if (routeType === 'werk' && slug) {
+      const product = getProduct(slug)
+      if (product) {
+        const structuredData = document.createElement('script')
+        structuredData.id = 'product-structured-data'
+        structuredData.type = 'application/ld+json'
+        structuredData.text = JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: product.title,
+          description: product.description,
+          image: `${siteUrl}/products/${product.id}.jpg`,
+          sku: `SD-${String(product.id).padStart(4, '0')}`,
+          brand: { '@type': 'Brand', name: 'Stilte & Draad' },
+          manufacturer: { '@type': 'Person', name: 'Jannie van Zanten' },
+        })
+        document.head.appendChild(structuredData)
+      }
+    }
   }, [activeZone, path])
 
   const renderRoute = () => {

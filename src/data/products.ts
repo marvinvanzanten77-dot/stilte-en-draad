@@ -121,6 +121,8 @@ export const products: Product[] = entries.map<Product>((product) => ({
 export const productCategories = ['Alles', 'Wandwerken', 'Tassen', 'Woontextiel', 'Objecten'] as const
 export const getProduct = (slug: string) => products.find((product) => product.slug === slug)
 const imageRevision = (product: Product) => product.imageId === 3 || product.imageId >= 22 ? '?v=20260727-source-2' : ''
-export const productImage = (product: Product) => `/products/${product.imageId}.jpg${imageRevision(product)}`
-export const productThumbnail = (product: Product) => `/products/thumbs/${product.imageId}.jpg${imageRevision(product)}`
+const optimizedImageIds = new Set([3, 22, 23, 24, 25])
+const productImageExtension = (product: Product) => optimizedImageIds.has(product.imageId) ? 'webp' : 'jpg'
+export const productImage = (product: Product) => `/products/${product.imageId}.${productImageExtension(product)}${imageRevision(product)}`
+export const productThumbnail = (product: Product) => `/products/thumbs/${product.imageId}.${productImageExtension(product)}${imageRevision(product)}`
 export const formatPrice = (price: number) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(price)

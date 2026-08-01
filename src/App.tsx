@@ -68,7 +68,7 @@ function AppContent() {
       title = `${zoneTitle ?? 'Stilte & Draad'} · Stilte & Draad`
       if (activeZone in editorialZones) image = new URL(editorialZones[activeZone as keyof typeof editorialZones].heroImage, siteUrl).href
       else if (activeZone === 'evenementen') image = `${siteUrl}/photos/rijdende-atelier-concept.jpg`
-      else if (activeZone === 'de-laatste-draad') image = `${siteUrl}/photos/de-laatste-draad.jpg?v=img-43802`
+      else if (activeZone === 'de-laatste-draad') image = `${siteUrl}/photos/de-laatste-draad.jpg?v=optimized-20260801`
     }
 
     document.title = title

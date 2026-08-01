@@ -28,7 +28,7 @@ Na het einde van dat huwelijk begon mijn vrije periode. Het werd een ontdekkings
 
 In die periode ontmoette ik de vader van mijn twee zoons. Eerst werd Marvin geboren en daarna Melton, mijn jongste. Uiteindelijk kwamen we terecht in een huis in Hoograven. Dat werd de plek waar wij samenwoonden en waar onze kinderen als gezin verder opgroeiden.
 
-Utrecht is daardoor niet één herinnering of één huis. Het is de plek waar ik als gevoelig meisje begon, waar ik moeder werd en waar ik voor het eerst bewust koos om mijn eigen leven te leiden.`, videoSrc: '/videos/kaart/utrecht.mp4?v=20260801', videoPoster: '/videos/kaart/utrecht-poster.png?v=20260801' },
+Utrecht is daardoor niet één herinnering of één huis. Het is de plek waar ik als gevoelig meisje begon, waar ik moeder werd en waar ik voor het eerst bewust koos om mijn eigen leven te leiden.`, videoSrc: '/videos/kaart/utrecht.mp4?v=optimized-20260801', videoPoster: '/videos/kaart/utrecht-poster.webp?v=optimized-20260801' },
   { id: 'zeist', country: 'Nederland', place: 'Zeist', x: 47, y: 24, accent: '#6f7957', title: 'Opnieuw ruimte voor mijzelf', text: 'In Zeist veranderde mijn rol binnen de familie. Na jaren intensief zorgen ontstond er opnieuw ruimte om dichter bij mijzelf te komen en mijn eigen leven vorm te geven.', transcript: `Toen mijn kinderen oud genoeg waren om op zichzelf te wonen, verhuisde ik naar een rustigere en intiemere plek in Zeist. Mijn dochter woonde met haar twee kinderen in hetzelfde gebouw. Dat maakte de afstand tussen ons klein, niet alleen letterlijk, maar ook in ons dagelijks leven.
 
 Omdat de vader van haar kinderen niet aanwezig was, speelde ik tijdens hun eerste jaren een grote rol in de verzorging en opvoeding. Ik was veel bij hen en mocht hun ontwikkeling van heel dichtbij meemaken. Ook zag ik hoe mijn dochter groeide in haar rol als moeder. Die periode heeft ons bijzonder hecht gemaakt en ik ben dankbaar dat ik zoveel van hun jonge leven heb mogen delen.
@@ -37,7 +37,7 @@ Later kreeg mijn dochter een nieuwe partner. Als moeder en grootmoeder vond ik h
 
 In Zeist nam ik een Jack Russell in huis. Ze heette Dushi. Met haar kwam er opnieuw beweging en gezelschap in een huis dat plotseling leger en stiller voelde. Dankzij haar bleef ik naar buiten gaan en ontstonden er onderweg vanzelf kleine contacten met andere mensen.
 
-Mijn twee zoons woonden allebei nog in Utrecht. Zij waren druk bezig hun eigen weg te vinden. Zo ging ieder van ons steeds meer een eigen richting op. Voor mij werd Zeist de plek waar zorgen voor anderen langzaam weer plaats mocht maken voor aandacht voor mijn eigen leven.`, videoSrc: '/videos/kaart/zeist.mp4', videoPoster: '/videos/kaart/zeist-poster.png' },
+Mijn twee zoons woonden allebei nog in Utrecht. Zij waren druk bezig hun eigen weg te vinden. Zo ging ieder van ons steeds meer een eigen richting op. Voor mij werd Zeist de plek waar zorgen voor anderen langzaam weer plaats mocht maken voor aandacht voor mijn eigen leven.`, videoSrc: '/videos/kaart/zeist.mp4?v=optimized-20260801', videoPoster: '/videos/kaart/zeist-poster.webp?v=optimized-20260801' },
   { id: 'ijzendoorn', country: 'Nederland', place: 'IJzendoorn', x: 47, y: 24, accent: '#b78a42', title: 'Waar ik de draad terugvond', text: 'In IJzendoorn leerde ik de stilte niet langer als leegte te zien. Hier ontdekte ik opnieuw dat ik een maker ben en vond de beweging van mijn leven een plek in mijn handen.', transcript: `Ik woon nu zeven jaar in IJzendoorn. Misschien een vreemde keuze voor een vrouw die altijd van het bruisende leven heeft gehouden: salsa, dansen, feesten, flirten en avontuur.
 
 Blijkbaar werd ook ik ouder. Niet per se saaier, maar wel uitgekeken op het idee dat ik het leven altijd buiten mijzelf moest zoeken. Ik koos voor een plek waar ik nog sterker met de leegte en de stilte werd geconfronteerd. Voor het eerst woonde ik niet meer in de buurt van mijn kinderen. Ik verruilde de hele regio Utrecht voor een klein dorp in de Betuwe. Helemaal alleen was ik niet; in het nabijgelegen Tiel woont nog een zus van mij.
@@ -48,7 +48,7 @@ Tijdens een cursus leerde ik haken. Daarmee leerde ik ook om werkelijk stil te z
 
 Vroeger bracht ik vooral de mensen om mij heen in beweging, met mijn humor, gastvrijheid, energie en passie. In IJzendoorn begon ik de draad in beweging te brengen. Steek voor steek ontstonden kleuren, vormen en verhalen onder mijn handen.
 
-Misschien was dit wel de rode draad die ik mijn hele leven in de buitenwereld had gezocht. Niet iets wat ik nog hoefde te vinden, maar iets wat al die tijd in mij aanwezig was en alleen op voldoende stilte had gewacht om zichtbaar te worden.`, videoSrc: '/videos/kaart/ijzendoorn.mp4', videoPoster: '/videos/kaart/ijzendoorn-poster.png' },
+Misschien was dit wel de rode draad die ik mijn hele leven in de buitenwereld had gezocht. Niet iets wat ik nog hoefde te vinden, maar iets wat al die tijd in mij aanwezig was en alleen op voldoende stilte had gewacht om zichtbaar te worden.`, videoSrc: '/videos/kaart/ijzendoorn.mp4?v=optimized-20260801', videoPoster: '/videos/kaart/ijzendoorn-poster.webp?v=optimized-20260801' },
   { id: 'marokko', country: 'Marokko', place: 'Fez', x: 44, y: 48, accent: '#b56b45', title: 'Een draad zonder antwoord', text: 'In Fez ontdekte Jannie opnieuw dat oprechte aandacht soms genoeg is om iemand te herinneren aan de mogelijkheden die hij zelf niet meer zag.', transcript: `Ook naar Fez reisde ik alleen.
 
 Na Suriname was ik eraan gewend geraakt om zelfstandig op weg te gaan. Toch verdween de spanning nooit helemaal. Iedere reis begon met hetzelfde dubbele gevoel: vertrouwen in wat ik inmiddels kon, en onzekerheid over alles wat ik nog niet kende.
@@ -102,7 +102,7 @@ gespannen tussen Fez en hier.
 En zo nu en dan,
 wanneer het stil genoeg is,
 vraag ik me af
-waar die draad hem naartoe heeft geleid.`, videoSrc: '/videos/kaart/marokko.mp4', videoPoster: '/videos/kaart/marokko-poster.png' },
+waar die draad hem naartoe heeft geleid.`, videoSrc: '/videos/kaart/marokko.mp4?v=optimized-20260801', videoPoster: '/videos/kaart/marokko-poster.webp?v=optimized-20260801' },
   { id: 'suriname', country: 'Suriname', x: 27, y: 64, accent: '#657750', title: 'Wat er achter de onzekerheid wachtte', text: 'Een reis die moeilijk begon, maar Jannie leerde dat een onzeker begin niet hoeft te bepalen hoe de rest van het verhaal verloopt.', transcript: `Voor het eerst in mijn leven besloot ik een grote stap te zetten.
 
 Een kleine stap voor sommigen.
@@ -179,7 +179,7 @@ En juist doordat ik bleef, mocht ik ervaren wat er achter die onzekerheid op mij
 
 Een reis die ik nooit had kunnen maken
 als ik bij het moeilijke begin
-al had besloten dat het voorbij was.`, videoSrc: '/videos/kaart/suriname.mp4', videoPoster: '/videos/kaart/suriname-poster.png' },
+al had besloten dat het voorbij was.`, videoSrc: '/videos/kaart/suriname.mp4?v=optimized-20260801', videoPoster: '/videos/kaart/suriname-poster.webp?v=optimized-20260801' },
   { id: 'griekenland', country: 'Griekenland', place: 'Corfu', x: 59, y: 40, accent: '#58778b', title: 'De reis die nog altijd verdergaat', text: 'Corfu werd een plek van vriendschap, herinnering en een reis die ooit door de bergen mag worden voltooid voor Melton.', transcript: `Ook deze reis begon ik alleen.
 
 Met een koffer vol kleding, een hoofd vol gedachten en dat vertrouwde verlangen om te ontdekken wat er achter het bekende lag, vertrok ik naar Corfu. Ik verbleef in een appartement in de stad, op een plek waar niemand mij kende en waar iedere dag nog open voor me lag.
@@ -275,7 +275,7 @@ Daarom wil ik ooit terug.
 
 Niet om dezelfde reis opnieuw te maken,
 maar om verder te gaan
-waar deze is begonnen.`, videoSrc: '/videos/kaart/ibiza.mp4', videoPoster: '/videos/kaart/ibiza-poster.png' },
+waar deze is begonnen.`, videoSrc: '/videos/kaart/ibiza.mp4?v=optimized-20260801', videoPoster: '/videos/kaart/ibiza-poster.webp?v=optimized-20260801' },
 ]
 
 const countries = [

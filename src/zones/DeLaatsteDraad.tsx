@@ -31,7 +31,10 @@ const DeLaatsteDraad = () => (
         <p className="mt-7 text-[9px] uppercase tracking-[0.18em] text-white/40">Wat komt er na de laatste draad?</p>
       </div>
       <div className="relative min-h-80 overflow-hidden md:min-h-full">
-        <img src="/photos/de-laatste-draad.jpg?v=img-43802" alt="Jannie in haar atelier tussen haar garens, tassen en draadwerken" width="6000" height="4000" className="absolute inset-0 h-full w-full object-cover" />
+        <picture>
+          <source srcSet="/photos/de-laatste-draad.webp?v=optimized-20260801" type="image/webp" />
+          <img src="/photos/de-laatste-draad.jpg?v=optimized-20260801" alt="Jannie in haar atelier tussen haar garens, tassen en draadwerken" width="2200" height="1467" className="absolute inset-0 h-full w-full object-cover" />
+        </picture>
         <div className="absolute inset-0 bg-gradient-to-r from-[#312e29] via-transparent to-transparent md:block" />
         <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#312e29]/65 to-transparent" />
       </div>

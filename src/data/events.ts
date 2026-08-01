@@ -28,7 +28,7 @@ export const events: AtelierEvent[] = [
     locationNote: 'Tegenover Kasteel Amerongen',
     admission: 'Gratis te bezoeken',
     description: 'Ontmoet Jannie en ontdek Stilte & Draad op de Grietmarkt in Amerongen.',
-    image: '/events/grietmarkt-amerongen-2026.jpg',
+    image: '/events/grietmarkt-amerongen-2026.webp',
     imageAlt: 'Bezoekers en marktkramen op een eerdere Grietmarkt in Amerongen',
     imageCaption: 'Sfeerbeeld van een eerdere editie van de Grietmarkt, 11 mei 2013.',
   },

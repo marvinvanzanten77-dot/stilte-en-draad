@@ -10,13 +10,33 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Jannie van Zanten",
-        "birthDate": "1954-12-23",
-        "birthPlace": { "@type": "Place", "name": "Utrecht" },
-        "url": "https://www.stilte-en-draad.nl/",
-        "brand": { "@type": "Brand", "name": "Stilte & Draad" },
-        "jobTitle": "Textielmaker"
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://www.stilte-en-draad.nl/#jannie",
+            "name": "Jannie van Zanten",
+            "birthDate": "1954-12-23",
+            "birthPlace": { "@type": "Place", "name": "Utrecht" },
+            "url": "https://www.stilte-en-draad.nl/veld",
+            "jobTitle": "Textielmaker"
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://www.stilte-en-draad.nl/#organisatie",
+            "name": "Stilte & Draad",
+            "url": "https://www.stilte-en-draad.nl/",
+            "email": "info@stilte-en-draad.nl",
+            "identifier": "KvK 96261994",
+            "founder": { "@id": "https://www.stilte-en-draad.nl/#jannie" },
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "P.C. Boogaerdtstraat 2",
+              "postalCode": "4053 JV",
+              "addressLocality": "IJzendoorn",
+              "addressCountry": "NL"
+            }
+          }
+        ]
       }
     </script>
     <title>Stilte &amp; Draad · door Jannie</title>

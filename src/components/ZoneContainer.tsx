@@ -9,7 +9,7 @@ import Evenementen from '../zones/Evenementen'
 import DeLaatsteDraad from '../zones/DeLaatsteDraad'
 
 const ZoneContainer = ({ activeZone, navigate }: { activeZone: ZoneId; navigate: (path: string) => void }) => {
-  const content: Record<ZoneId, React.ReactNode> = { 'de-eerste-draad': <DeEersteDraad />, veld: <Veld />, droom: <Droom />, ritueel: <Ritueel />, stilte: <Stilte />, webshop: <Webshop navigate={navigate} />, evenementen: <Evenementen />, 'de-laatste-draad': <DeLaatsteDraad /> }
+  const content: Record<ZoneId, React.ReactNode> = { 'de-eerste-draad': <DeEersteDraad />, veld: <Veld />, droom: <Droom />, ritueel: <Ritueel />, stilte: <Stilte />, webshop: <Webshop navigate={navigate} />, evenementen: <Evenementen navigate={navigate} />, 'de-laatste-draad': <DeLaatsteDraad /> }
   const index = zones.findIndex((zone) => zone.id === activeZone)
   const previous = zones[index - 1]
   const next = zones[index + 1]

@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
+import { useDialogFocus } from '../hooks/useDialogFocus'
 
 type DreamCard = {
   id: string
@@ -26,13 +27,9 @@ const dreamCards = dreamCardEntries.map((card) => ({ ...card, image: card.image.
 
 const DreamCards = () => {
   const [selected, setSelected] = useState<DreamCard | null>(null)
-
-  useEffect(() => {
-    if (!selected) return
-    const close = (event: KeyboardEvent) => event.key === 'Escape' && setSelected(null)
-    document.addEventListener('keydown', close)
-    return () => document.removeEventListener('keydown', close)
-  }, [selected])
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const close = useCallback(() => setSelected(null), [])
+  useDialogFocus(selected !== null, dialogRef, close)
 
   return <div className="relative overflow-hidden rounded-2xl border border-white/50 bg-[#c9b99d]/40 p-4 shadow-inner sm:p-5">
     <p className="sr-only">Er liggen twaalf gedekte droomkaarten. Iedere knop trekt één kaart en opent de titel, betekenis en een kleine uitnodiging voor vandaag.</p><div className="grid grid-cols-6 gap-2 sm:gap-3" aria-label="Twaalf gedekte droomkaarten">
@@ -45,15 +42,15 @@ const DreamCards = () => {
     </div>
     <p className="mt-4 text-center text-[8px] uppercase tracking-[0.18em] text-neutral-500">Kies de kaart die naar je toe trekt</p>
 
-    {selected && <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#d8cbb5]/95 p-4 backdrop-blur-sm">
+    {selected && <div ref={dialogRef} className="absolute inset-0 z-10 flex items-center justify-center bg-[#d8cbb5]/95 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="dream-card-title">
       <div className="grid max-h-full w-full grid-cols-[minmax(105px,.72fr)_1.28fr] gap-4 overflow-y-auto rounded-xl border border-white/60 bg-[#eee4d2] p-3 shadow-xl sm:grid-cols-[minmax(145px,.8fr)_1.2fr] sm:gap-5 sm:p-4">
         <img src={selected.image} alt={`Textielkaart ${selected.title}`} className="aspect-[2/3] w-full rounded-lg object-cover shadow-[0_8px_18px_rgba(62,44,27,.22)]" />
         <div className="flex min-w-0 flex-col justify-center py-1">
           <p className="text-[8px] uppercase tracking-[0.2em] text-[#9b7d4f]">Jouw droomkaart</p>
-          <h3 className="mt-2 text-sm font-semibold uppercase tracking-[0.13em] sm:text-base">{selected.title}</h3>
+          <h3 id="dream-card-title" className="mt-2 text-sm font-semibold uppercase tracking-[0.13em] sm:text-base">{selected.title}</h3>
           <p className="mt-3 text-xs leading-5 text-neutral-600 sm:text-sm sm:leading-6">{selected.meaning}</p>
           <div className="mt-3 border-l border-[#9b7d4f]/55 pl-3"><p className="text-[7px] uppercase tracking-[0.17em] text-neutral-500">Vandaag</p><p className="mt-1.5 font-serif text-xs leading-5 text-neutral-700 sm:text-sm">{selected.invitation}</p></div>
-          <button type="button" onClick={() => setSelected(null)} className="mt-4 self-start rounded-full border border-neutral-800/20 px-3 py-2 text-[8px] uppercase tracking-[0.14em] transition hover:bg-white/60">Leg terug en kies opnieuw</button>
+          <button type="button" onClick={close} className="mt-4 self-start rounded-full border border-neutral-800/20 px-3 py-2 text-[8px] uppercase tracking-[0.14em] transition hover:bg-white/60">Leg terug en kies opnieuw</button>
     </div>
       </div>
     </div>}

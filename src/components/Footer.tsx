@@ -5,8 +5,10 @@ const Footer = ({ navigate }: FooterProps) => (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <span>© {new Date().getFullYear()} Stilte &amp; Draad · door Jannie</span>
       <nav aria-label="Juridische informatie" className="flex flex-wrap gap-x-5 gap-y-2">
+        <button type="button" onClick={() => navigate('/contact')} className="hover:text-neutral-900">Contact</button>
         <button type="button" onClick={() => navigate('/privacy')} className="hover:text-neutral-900">Privacy</button>
         <button type="button" onClick={() => navigate('/algemene-voorwaarden')} className="hover:text-neutral-900">Algemene voorwaarden</button>
+        <button type="button" onClick={() => navigate('/herroepen')} className="hover:text-neutral-900">Bestelling herroepen</button>
         <button type="button" onClick={() => window.dispatchEvent(new Event('open-cookie-settings'))} className="hover:text-neutral-900">Cookievoorkeuren</button>
       </nav>
     </div>

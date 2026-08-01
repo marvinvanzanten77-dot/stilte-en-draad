@@ -5,20 +5,30 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:full": "vercel dev",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:db": "RUN_DATABASE_INTEGRATION_TESTS=true node --env-file-if-exists=.env.local ./node_modules/vitest/vitest.mjs run api/_lib/postgres-concurrency.test.ts",
+    "typecheck": "tsc -b --pretty false",
+    "typecheck:api": "tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --esModuleInterop --skipLibCheck --types node api/_lib/*.ts api/checkout/create.ts api/donations/create.ts api/mollie/webhook.ts api/payments/config.ts api/products/status.ts api/withdrawals/create.ts 'api/orders/[orderId]/status.ts'",
+    "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mollie/api-client": "^4.6.0",
     "framer-motion": "^12.23.26",
+    "postgres": "^3.4.9",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
+    "@vercel/node": "^5.8.27",
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.22",
     "eslint": "^9.39.1",
@@ -29,6 +39,7 @@
     "tailwindcss": "^3.4.14",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "vitest": "^4.1.10"
   }
 }

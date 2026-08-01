@@ -1,5 +1,9 @@
 # Neon PostgreSQL koppelen aan Vercel
 
+## Volledige lokale omgeving
+
+Start frontend en Functions samen met `npm run dev:full -- --listen 5173`. Dit script gebruikt bewust `vercel dev --local`: zo worden verzoeken naar `/api/*` door de lokale Vercel Functions afgehandeld voordat Vite de SPA serveert. `npm run dev` start alleen de frontend. Een gelinkte `vercel dev` zonder `--local` kan de projectinstelling voor de Vite-devserver overnemen en TypeScript-bronbestanden onder `/api` teruggeven in plaats van de Functions uit te voeren.
+
 De applicatie gebruikt de npm-package `postgres` en verwacht een volledige PostgreSQL-connection string in `DATABASE_URL`. Gebruik voor de serverless runtime de gepoolde Neon-URL; de host bevat dan `-pooler`. TLS moet in de URL staan. Gebruik de door Neon geleverde gepoolde database-URL en neem geen voorbeeld met gebruikersnaam of wachtwoord op in documentatie.
 
 Neem de URL letterlijk uit Neon over. Als Neon ook `channel_binding=require` toevoegt, laat die parameter staan. Zet nooit een database-URL in een `VITE_…`-variabele.

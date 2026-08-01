@@ -43,6 +43,7 @@ function AppContent() {
     let description = defaultDescription
     let image = `${siteUrl}/mood-board/Golden_Atelier_Morning.png`
     const [, routeType, slug] = path.split('/')
+    const standaloneRoute = path === '/contact' || path === '/privacy' || path === '/algemene-voorwaarden' || path === '/herroepen' || path === '/checkout' || path === '/doneren' || path.startsWith('/betaling/')
     if (path === '/contact') {
       title = 'Contact · Stilte & Draad'
       description = `Neem contact op met ${siteDetails.name}, het atelier van ${siteDetails.owner}.`
@@ -63,7 +64,7 @@ function AppContent() {
         description = `${product.description} Handgemaakt, uniek werk van Jannie van Zanten.`
         image = new URL(productImage(product), siteUrl).href
       }
-    } else if (path !== '/contact' && path !== '/privacy' && path !== '/algemene-voorwaarden') {
+    } else if (!standaloneRoute) {
       const zoneTitle = zones.find((zone) => zone.id === activeZone)?.label.toLocaleLowerCase('nl-NL').replace(/(^|\s)\S/g, (letter) => letter.toUpperCase())
       title = `${zoneTitle ?? 'Stilte & Draad'} · Stilte & Draad`
       if (activeZone in editorialZones) image = new URL(editorialZones[activeZone as keyof typeof editorialZones].heroImage, siteUrl).href

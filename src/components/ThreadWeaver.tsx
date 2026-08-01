@@ -159,7 +159,7 @@ const ThreadWeaver = () => {
             <polygon points={outerHexagon} />
             <polygon points={innerHexagon} />
             {pegs.slice(0, 6).map((peg, index) => (
-              <path key={`${peg.x}-guide`} d={`M ${peg.x} ${peg.y} L ${pegs[index + 6].x} ${pegs[index + 6].y} L ${pegs[(index + 2) % 6].x} ${pegs[(index + 2) % 6].y}`} />
+              <path key={`guide-${index}`} d={`M ${peg.x} ${peg.y} L ${pegs[index + 6].x} ${pegs[index + 6].y} L ${pegs[(index + 2) % 6].x} ${pegs[(index + 2) % 6].y}`} />
             ))}
           </g>}
 

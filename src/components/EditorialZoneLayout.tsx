@@ -18,7 +18,10 @@ const EditorialZoneLayout = ({ content, continuation = false }: { content: Edito
   <article className={`overflow-hidden rounded-2xl bg-[#ded2bd] shadow-soft ring-1 ring-neutral-200/40 ${continuation ? 'mt-6' : ''}`}>
     <header className="grid gap-8 p-7 md:grid-cols-[minmax(0,1fr)_minmax(280px,.9fr)] md:items-center md:p-12">
       <div><p className="text-[10px] uppercase tracking-[0.22em] text-neutral-500">{content.eyebrow}</p><h1 className="mt-3 text-3xl font-semibold uppercase tracking-[0.17em]">{content.title}</h1><p className="mt-5 max-w-xl text-lg leading-8 text-neutral-700">{content.coreLine}</p><p className="mt-5 max-w-xl text-sm leading-7 text-neutral-600">{content.introduction}</p><p className="mt-6 text-[10px] uppercase tracking-[0.16em] text-neutral-500">{content.question}</p></div>
-      <img src={content.heroImage} alt={content.heroAlt} loading={continuation ? 'lazy' : 'eager'} className="aspect-[4/3] h-full max-h-96 w-full rounded-xl object-cover shadow-soft" />
+      <picture className="block h-full max-h-96 w-full">
+        {content.heroImageWebp && <source srcSet={content.heroImageWebp} type="image/webp" />}
+        <img src={content.heroImage} alt={content.heroAlt} loading={continuation ? 'lazy' : 'eager'} decoding="async" className="aspect-[4/3] h-full max-h-96 w-full rounded-xl object-cover shadow-soft" />
+      </picture>
     </header>
 
     <section className="border-t border-neutral-800/10 p-7 md:p-12" aria-labelledby={`${content.interactionType}-chapters`}><div className="flex items-end justify-between gap-4"><div><p className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">Drie draden</p><h2 id={`${content.interactionType}-chapters`} className="mt-2 text-lg font-semibold uppercase tracking-[0.14em]">Een verhaal in drie bewegingen</h2></div></div><div className="mt-7 grid gap-4 md:grid-cols-3">{content.chapters.map((chapter) => <section key={chapter.number} className="min-h-52 rounded-xl border border-white/45 bg-white/20 p-6"><span className="font-serif text-2xl text-[#9b7d4f]">{chapter.number}</span><h3 className="mt-7 text-sm font-semibold uppercase tracking-[0.14em]">{chapter.title}</h3><p className="mt-3 text-sm leading-6 text-neutral-600">{chapter.prompt}</p><div className="mt-6 h-px w-8 bg-[#9b7d4f]/50" /></section>)}</div></section>

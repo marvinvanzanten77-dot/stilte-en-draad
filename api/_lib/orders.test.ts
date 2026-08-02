@@ -27,7 +27,7 @@ describe('betrouwbare productbron en productgereedheid', () => {
   })
 
   it('houdt een incompleet tentoonstellingswerk uit de checkout', () => {
-    expect(() => trustedItems([3])).toThrow('Ontbreekt: kwetsbaarheid')
+    expect(() => trustedItems([3])).toThrow('Ontbreekt: vrijgave als purchasable')
   })
 
   it('blokkeert verzending voordat een werk bestelbaar is', () => {

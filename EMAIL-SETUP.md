@@ -2,6 +2,25 @@
 
 De bestaande database-outbox en de Resend-provider zijn technisch voorbereid, maar verzending staat bewust uit. Dit staat los van Mollie: `PAYMENTS_ENABLED=false` blijft ongewijzigd.
 
+## Actuele Resend-status — 2 augustus 2026
+
+- Provider: Resend.
+- Domein: `mail.stilte-en-draad.nl`.
+- Regio: `eu-west-1` (Ireland).
+- De vereiste DKIM-, SPF- en MX-records zijn bij MijnDomein toegevoegd.
+- Domain Events meldt `DNS verified`, maar de algemene domeinstatus staat nog op `pending`/`verifying`.
+- `Enable Sending` staat aan in Resend; `Enable Receiving` staat uit.
+- Er is nog geen Resend API-key aangemaakt.
+- `EMAIL_ENABLED=false` blijft in iedere omgeving gehandhaafd.
+- Er wordt nog geen testmail of echte e-mail verstuurd.
+- Gepland afzenderadres na volledige verificatie: `Stilte & Draad <bericht@mail.stilte-en-draad.nl>`.
+- Gepland Reply-To- en bereikbaar contactadres: `marvinvanzanten77@gmail.com`.
+- `info@stilte-en-draad.nl` is geen bestaande mailbox en mag niet als bereikbaar adres worden gebruikt.
+
+MijnDomein heeft bij het toevoegen van de DNS-records het algemene DMARC-beleid op monitoring (`none`) gezet en het bestaande SPF-beleid op soft-fail (`~all`). Dit moet vóór volledige livegang bewust opnieuw worden beoordeeld en waar mogelijk worden aangescherpt.
+
+De volgende e-mailfase start pas wanneer Resend de algemene domeinstatus volledig als `verified` toont. `DNS verified` in Domain Events alleen is hiervoor niet voldoende.
+
 ## Wat al werkt
 
 - De outbox ondersteunt ontvangst, betaalstatus, donatie en herroeping.
@@ -10,23 +29,22 @@ De bestaande database-outbox en de Resend-provider zijn technisch voorbereid, ma
 - De verwerkingsroute accepteert alleen een correct Bearer-secret.
 - Alle berichttypen hebben een eenvoudige Nederlandstalige tekstversie.
 
-## Wat handmatig nodig blijft
+## Volgende gecontroleerde fase — nog niet uitvoeren
 
-1. Maak een Resend-account of koppel Resend later via de Vercel Marketplace.
-2. Verifieer `stilte-en-draad.nl` bij Resend en plaats de gevraagde SPF- en DKIM-records bij de DNS-provider.
-3. Stel uitsluitend server-side in Vercel in:
-   - `RESEND_API_KEY`
-   - `EMAIL_FROM`
-   - `EMAIL_REPLY_TO`
-   - `CRON_SECRET`
-   - `EMAIL_ENABLED=false`
-4. Test ieder berichttype eerst met een gecontroleerd testadres.
-5. Zet pas na visuele controle en een geslaagde ontvangsttest `EMAIL_ENABLED=true` in de bedoelde omgeving.
-6. Voeg pas daarna een Vercel Cron toe voor `/api/email/process`; zonder cron of handmatige beveiligde oproep wordt de wachtrij niet verwerkt.
+1. Wacht totdat Resend `mail.stilte-en-draad.nl` volledig als `verified` toont.
+2. Maak daarna een beperkte Resend API-key aan met alleen de noodzakelijke verzendrechten.
+3. Configureer de key uitsluitend als server-side Vercel-secret; zet haar nooit in Git, documentatie of browsercode.
+4. Stel server-side `EMAIL_FROM` in op `Stilte & Draad <bericht@mail.stilte-en-draad.nl>` en `EMAIL_REPLY_TO` op `marvinvanzanten77@gmail.com`.
+5. Houd `EMAIL_ENABLED=false` in Production en test eerst uitsluitend in Preview met een gecontroleerd testadres.
+6. Controleer alle zes transactionele berichttypen: bestelling ontvangen, betaling geslaagd, betaling mislukt/geannuleerd, handmatige betaalcontrole, donatie bevestigd en herroeping ontvangen.
+7. Test retries, de vaste idempotency-key en de verwerking van de database-outbox zonder dubbele verzending.
+8. Activeer Production pas na een volledig geslaagde acceptatietest en afzonderlijke toestemming.
+9. Beoordeel vóór volledige livegang het DMARC-beleid (`none`) en SPF-beleid (`~all`) opnieuw en scherp die waar mogelijk aan.
+10. Voeg pas na acceptatie een Vercel Cron toe voor `/api/email/process`; zonder cron of handmatige beveiligde oproep wordt de wachtrij niet verwerkt.
 
 ## Veiligheidsregels
 
 - Zet nooit een sleutel in Git, documentatie, browsercode of een variabele met `VITE_`-prefix.
-- Activeer Production pas nadat SPF en DKIM geldig zijn en alle zes berichttypen zijn gecontroleerd.
+- Activeer Production pas nadat Resend het domein volledig als `verified` toont, SPF en DKIM geldig zijn en alle zes berichttypen zijn gecontroleerd.
 - Gebruik voor Preview een afzonderlijke testconfiguratie en een ontvanger die door Marvin wordt beheerd.
 - Log geen berichtinhoud, e-mailadres of providerantwoord met persoonsgegevens.

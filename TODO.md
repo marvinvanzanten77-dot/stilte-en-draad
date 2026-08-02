@@ -14,13 +14,18 @@ Dit bestand bevat uitsluitend werkzaamheden die nog niet aantoonbaar zijn afgero
 - [ ] Mollie-testkey en overige servervariabelen veilig in Vercel instellen.
 - [ ] Alle echte Mollie-testscenario’s, webhooks en concurrencytest op een testdatabase doorlopen.
 - [ ] Mollie pas na een geslaagde acceptatietest bewust naar live omzetten.
-- [ ] Een externe mailprovider kiezen en bestel-, betaal- en donatiebevestigingen activeren.
+- [x] Resend als toekomstige transactionele mailprovider kiezen en de vereiste DNS-records voor `mail.stilte-en-draad.nl` toevoegen.
+- [ ] Wachten totdat Resend de algemene domeinstatus volledig als `verified` toont; Domain Events meldt al `DNS verified`, maar de domeinstatus is nog `pending`/`verifying`.
+- [ ] Daarna een beperkte Resend API-key aanmaken en uitsluitend als Vercel-secret configureren; `EMAIL_ENABLED=false` blijft gehandhaafd.
+- [ ] Eerst in Preview alle zes berichttypen, retries, idempotency en outboxverwerking testen terwijl Production uitgeschakeld blijft.
+- [ ] Na geslaagde acceptatietest afzonderlijk toestemming vragen voordat transactionele e-mail in Production wordt geactiveerd.
+- [ ] Het door MijnDomein aangepaste DMARC-beleid (`none`) en SPF-beleid (`~all`) vóór volledige livegang opnieuw beoordelen en waar mogelijk aanscherpen.
 - [ ] SumUp later uitsluitend voor fysieke betalingen configureren.
 
 ## Belangrijkste blokkades vóór opening van de webshop
 
 1. [ ] Mollie-testconfiguratie instellen en alle acceptatietests, webhooks en foutscenario’s doorlopen.
-2. [ ] Een mailprovider koppelen en bestel-, betaal-, donatie- en herroepingsbevestigingen activeren.
+2. [ ] Resend pas na volledige domeinverificatie veilig koppelen, in Preview testen en daarna bestel-, betaal-, donatie- en herroepingsbevestigingen gecontroleerd activeren.
 3. [ ] De wettelijk conforme digitale herroepingsstroom end-to-end testen en activeren.
     - [x] Migratie `002_withdrawals.sql` op de gekoppelde Neon-database uitvoeren.
     - [ ] De mailprovider koppelen en het berichttype `withdrawal_received` met het voorbereide bevestigingssjabloon verzenden.

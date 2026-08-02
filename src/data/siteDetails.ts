@@ -1,7 +1,7 @@
 export const siteDetails = {
   name: 'Stilte & Draad',
   owner: 'Jannie van Zanten',
-  email: 'info@stilte-en-draad.nl',
+  email: 'marvinvanzanten77@gmail.com',
   chamberOfCommerce: '96261994',
   address: {
     street: 'P.C. Boogaerdtstraat 2',

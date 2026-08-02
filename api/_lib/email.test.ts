@@ -26,7 +26,7 @@ describe('e-mail-outbox', () => {
     })
     expect(content.subject).toContain('HER-20260727-ABC12345')
     expect(content.text).toContain('gehele bestelling')
-    expect(content.text).toContain('info@stilte-en-draad.nl')
+    expect(content.text).toContain('marvinvanzanten77@gmail.com')
   })
 
   it('vangt providerfouten af en plant een retry zonder de betaalflow te laten falen', async () => {

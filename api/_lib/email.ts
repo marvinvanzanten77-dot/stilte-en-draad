@@ -37,7 +37,7 @@ export const withdrawalConfirmationContent = (payload: {
     `Omvang: ${payload.scope === 'full' ? 'gehele bestelling' : 'deel van de bestelling'}`,
     '',
     'Bewaar deze bevestiging. We nemen contact op met de retourinstructies.',
-    'Stilte & Draad · info@stilte-en-draad.nl',
+    'Stilte & Draad · antwoord via marvinvanzanten77@gmail.com',
   ].join('\n'),
 })
 
@@ -56,23 +56,23 @@ export const emailContent = (message: EmailMessage) => {
   const content: Record<Exclude<EmailMessageType, 'withdrawal_received'>, { subject: string; text: string }> = {
     order_received: {
       subject: 'We hebben je bestelling ontvangen',
-      text: 'We hebben je bestelling ontvangen. Zodra de betaling is bevestigd, laten we je weten hoe het werk bij je komt.\n\nStilte & Draad · info@stilte-en-draad.nl',
+      text: 'We hebben je bestelling ontvangen. Zodra de betaling is bevestigd, laten we je weten hoe het werk bij je komt.\n\nStilte & Draad · antwoord via marvinvanzanten77@gmail.com',
     },
     payment_succeeded: {
       subject: 'Je betaling is ontvangen',
-      text: 'Je betaling is ontvangen. We nemen contact op over afhalen of, als dat voor dit werk is afgesproken, verzending.\n\nStilte & Draad · info@stilte-en-draad.nl',
+      text: 'Je betaling is ontvangen. We nemen contact op over afhalen of, als dat voor dit werk is afgesproken, verzending.\n\nStilte & Draad · antwoord via marvinvanzanten77@gmail.com',
     },
     payment_failed_or_canceled: {
       subject: 'Je betaling is niet afgerond',
-      text: 'Je betaling is niet afgerond. Er is niets definitief besteld. Neem gerust contact op als je hulp nodig hebt.\n\nStilte & Draad · info@stilte-en-draad.nl',
+      text: 'Je betaling is niet afgerond. Er is niets definitief besteld. Neem gerust contact op als je hulp nodig hebt.\n\nStilte & Draad · antwoord via marvinvanzanten77@gmail.com',
     },
     payment_review: {
       subject: 'We controleren je betaling persoonlijk',
-      text: 'Je betaling vraagt om een handmatige controle. We nemen persoonlijk contact op voordat er iets met je bestelling gebeurt.\n\nStilte & Draad · info@stilte-en-draad.nl',
+      text: 'Je betaling vraagt om een handmatige controle. We nemen persoonlijk contact op voordat er iets met je bestelling gebeurt.\n\nStilte & Draad · antwoord via marvinvanzanten77@gmail.com',
     },
     donation_confirmed: {
       subject: 'Dank je voor je bijdrage aan het rijdende atelier',
-      text: 'Dank je voor je bijdrage. Je helpt mee aan de aanschaf en verbouwing van de bus waarmee Stilte & Draad naar markten en festivals kan reizen.\n\nStilte & Draad · info@stilte-en-draad.nl',
+      text: 'Dank je voor je bijdrage. Je helpt mee aan de aanschaf en verbouwing van de bus waarmee Stilte & Draad naar markten en festivals kan reizen.\n\nStilte & Draad · antwoord via marvinvanzanten77@gmail.com',
     },
   }
   return content[message.type]

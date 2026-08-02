@@ -11,7 +11,7 @@
     "test": "vitest run",
     "test:db": "RUN_DATABASE_INTEGRATION_TESTS=true node --env-file-if-exists=.env.local ./node_modules/vitest/vitest.mjs run api/_lib/postgres-concurrency.test.ts",
     "typecheck": "tsc -b --pretty false",
-    "typecheck:api": "tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --esModuleInterop --skipLibCheck --types node api/_lib/*.ts api/checkout/create.ts api/donations/create.ts api/mollie/webhook.ts api/payments/config.ts api/products/status.ts api/withdrawals/create.ts 'api/orders/[orderId]/status.ts'",
+    "typecheck:api": "tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --esModuleInterop --skipLibCheck --types node api/_lib/*.ts api/checkout/create.ts api/donations/create.ts api/email/process.ts api/mollie/webhook.ts api/payments/config.ts api/products/status.ts api/withdrawals/create.ts 'api/orders/[orderId]/status.ts'",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs",
     "preview": "vite preview"
   },

@@ -7,7 +7,6 @@ import {
   createDonation,
   createPurchaseReservation,
   createWithdrawalRequest,
-  emailOutboxRepository,
   markCreationFailed,
 } from './store.js'
 
@@ -22,7 +21,7 @@ const suite = enabled ? describe.sequential : describe.skip
 suite('echte PostgreSQL-database-, voorraad- en concurrencylogica', () => {
   const sql = postgres(process.env.DATABASE_URL!, { max: 6, prepare: false })
   const migrationSql = postgres(process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL!, { max: 1, prepare: false })
-  const productIds = [9_900_026, 9_900_027, 9_900_028, 9_900_029]
+  const productIds = [9_900_026, 9_900_027, 9_900_028, 9_900_029, 9_900_030]
   const orderIds = [
     '00000000-0000-4000-8000-000000000261',
     '00000000-0000-4000-8000-000000000262',
@@ -32,6 +31,7 @@ suite('echte PostgreSQL-database-, voorraad- en concurrencylogica', () => {
     '00000000-0000-4000-8000-000000000266',
     '00000000-0000-4000-8000-000000000267',
     '00000000-0000-4000-8000-000000000268',
+    '00000000-0000-4000-8000-000000000272',
   ]
   const withdrawalId = '00000000-0000-4000-8000-000000000269'
 
@@ -69,8 +69,8 @@ suite('echte PostgreSQL-database-, voorraad- en concurrencylogica', () => {
   })
 
   beforeAll(async () => {
-    expect(await runMigrations()).toEqual(['001_mollie_checkout.sql', '002_withdrawals.sql'])
-    expect(await runMigrations()).toEqual(['001_mollie_checkout.sql', '002_withdrawals.sql'])
+    expect(await runMigrations()).toEqual(['001_mollie_checkout.sql', '002_withdrawals.sql', '003_fulfillment.sql'])
+    expect(await runMigrations()).toEqual(['001_mollie_checkout.sql', '002_withdrawals.sql', '003_fulfillment.sql'])
     await cleanup()
   })
 
@@ -82,7 +82,7 @@ suite('echte PostgreSQL-database-, voorraad- en concurrencylogica', () => {
 
   it('heeft beide migraties en alle vereiste tabellen, statussen en unieke sleutels', async () => {
     const migrations = await sql<{ version: string }[]>`select version from schema_migrations order by version`
-    expect(migrations.map((row) => row.version)).toEqual(expect.arrayContaining(['001_mollie_checkout', '002_withdrawals']))
+    expect(migrations.map((row) => row.version)).toEqual(expect.arrayContaining(['001_mollie_checkout', '002_withdrawals', '003_fulfillment']))
 
     const requiredTables = [
       'orders', 'order_items', 'product_inventory', 'order_audit_log', 'inventory_audit_log',
@@ -101,7 +101,26 @@ suite('echte PostgreSQL-database-, voorraad- en concurrencylogica', () => {
     `
     expect(constraints.some((row) => row.table_name === 'orders' && row.definition.includes('payment_review'))).toBe(true)
     expect(constraints.some((row) => row.table_name === 'orders' && row.definition.includes('idempotency_key'))).toBe(true)
+    expect(constraints.some((row) => row.table_name === 'orders' && row.definition.includes('shipping_cents = 695'))).toBe(true)
     expect(constraints.some((row) => row.table_name === 'withdrawal_requests' && row.definition.includes('idempotency_key'))).toBe(true)
+  })
+
+  it('bewaart een Nederlandse verzending met exact 695 cent en volledig adres', async () => {
+    const created = await createPurchaseReservation({
+      id: orderIds[8], orderNumber: 'TEST-SHIPPING-1', idempotencyKey: 'test-shipping-1',
+      subtotalCents: 2000, shippingCents: 695, totalCents: 2695, fulfillment: 'shipping',
+      customer: {
+        name: 'Database Test', email: 'database-test@example.nl', phone: null, address: 'Dorpsstraat 2 A',
+        postalCode: '4053 JV', city: 'IJzendoorn', country: 'NL', message: null,
+      },
+      items: [{ productId: productIds[4], title: 'Verzendtestwerk', unitPriceCents: 2000, stock: 1 }], reservationMinutes: 15,
+    })
+    expect(created).toBe(true)
+    const [order] = await sql<{ fulfillment: string; shipping_cents: number; total_cents: number; address: string; postal_code: string; city: string; country: string }[]>`
+      select fulfillment, shipping_cents, total_cents, address, postal_code, city, country from orders where id = ${orderIds[8]}
+    `
+    expect(order).toEqual({ fulfillment: 'shipping', shipping_cents: 695, total_cents: 2695, address: 'Dorpsstraat 2 A', postal_code: '4053 JV', city: 'IJzendoorn', country: 'NL' })
+    await markCreationFailed(orderIds[8])
   })
 
   it('laat van twee simultane reserveringen van hetzelfde unieke werk exact één slagen', async () => {
@@ -216,8 +235,16 @@ suite('echte PostgreSQL-database-, voorraad- en concurrencylogica', () => {
     expect(await sql`select id from withdrawal_requests where idempotency_key = ${input.idempotencyKey}`).toHaveLength(1)
     expect(await sql`select id from order_audit_log where order_id = ${orderIds[6]} and event_type = 'withdrawal_received'`).toHaveLength(1)
 
+    const [queued] = await sql<{ id: number; order_id: string; message_type: 'withdrawal_received'; recipient_email: string; payload: Record<string, unknown> }[]>`
+      select id, order_id, message_type, recipient_email, payload from email_outbox
+      where order_id = ${orderIds[6]} and message_type = 'withdrawal_received'
+    `
     const sent: string[] = []
-    await processEmailOutbox({ send: async (message) => { sent.push(message.type) } }, emailOutboxRepository, 20)
+    await processEmailOutbox({ send: async (message) => { sent.push(message.type) } }, {
+      pending: async () => [{ outboxId: queued.id, orderId: queued.order_id, type: queued.message_type, recipient: queued.recipient_email, payload: queued.payload }],
+      sent: async (outboxId) => { await sql`update email_outbox set status = 'sent', attempts = 1 where id = ${outboxId}` },
+      failed: async () => undefined,
+    }, 1)
     expect(sent).toContain('withdrawal_received')
     const [outbox] = await sql<{ status: string }[]>`
       select status from email_outbox where order_id = ${orderIds[6]} and message_type = 'withdrawal_received'

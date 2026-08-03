@@ -18,8 +18,6 @@ export const productReadinessIssues = (product: Product): string[] => {
   if (product.processingDays === null || product.processingDays < 0) issues.push('verwerkingstermijn')
   if (!product.deliveryTime?.trim()) issues.push('verwachte levertijd')
   if (product.shippingAllowed) {
-    if (product.weightGrams === null || product.weightGrams <= 0) issues.push('gewicht')
-    if (!product.shippingClass?.trim()) issues.push('verzendklasse')
     if (!product.shippingRegions?.length) issues.push('verzendregio')
     if (product.shippingCostCents === null || product.shippingCostCents < 0) issues.push('verzendkosten')
   }

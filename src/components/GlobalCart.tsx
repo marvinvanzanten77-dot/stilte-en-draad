@@ -46,7 +46,11 @@ const GlobalCart = ({ navigate }: { navigate: (path: string) => void }) => {
                 </div>
                 <div className="mt-auto pt-8">
                   <div className="flex items-center justify-between border-t border-neutral-800/10 pt-5 text-sm"><span className="uppercase tracking-[0.14em] text-neutral-500">Totaal</span><strong>{formatCents(totalCents)}</strong></div>
-                  <p className="mt-4 text-xs leading-5 text-neutral-600">Je haalt het werk op afspraak op in IJzendoorn, doorgaans binnen twee tot vijf werkdagen. Na je bestelling nemen we persoonlijk contact met je op om een geschikt moment af te spreken.</p>
+                  <div className="mt-4 space-y-2 rounded-xl border border-neutral-800/10 bg-white/30 p-4 text-xs leading-5 text-neutral-600">
+                    <p><strong className="font-medium text-neutral-800">Afhalen in IJzendoorn</strong> · gratis</p>
+                    <p><strong className="font-medium text-neutral-800">Verzenden binnen Nederland</strong> · €6,95 per volledige bestelling</p>
+                    <p>Je maakt de definitieve keuze tijdens het afrekenen.</p>
+                  </div>
                   <button type="button" onClick={goToCheckout} className="mt-5 w-full rounded-full bg-neutral-900 px-5 py-4 text-xs uppercase tracking-[0.16em] text-white">Naar veilig afrekenen</button>
                   <button type="button" onClick={clearCart} className="mt-4 w-full text-[10px] uppercase tracking-[0.14em] text-neutral-500 underline underline-offset-4">Maak winkelmand leeg</button>
                 </div>

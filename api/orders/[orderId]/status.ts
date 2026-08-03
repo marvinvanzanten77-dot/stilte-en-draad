@@ -24,6 +24,12 @@ export default async function handler(request: VercelRequest, response: VercelRe
       shippingCents: order.shipping_cents,
       totalCents: order.total_cents,
       fulfillment: order.fulfillment,
+      address: order.kind === 'purchase' && order.fulfillment === 'shipping' ? {
+        line: order.address,
+        postalCode: order.postal_code,
+        city: order.city,
+        country: order.country,
+      } : null,
       items: order.items,
     })
   } catch (error) {

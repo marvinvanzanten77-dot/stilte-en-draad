@@ -44,6 +44,14 @@ export const withdrawalConfirmationContent = (payload: {
 const payloadString = (payload: Record<string, unknown>, key: string) =>
   typeof payload[key] === 'string' ? payload[key] : ''
 
+const purchaseDeliveryText = (payload: Record<string, unknown>) => {
+  if (payload.fulfillment !== 'shipping') {
+    return 'Afhalen op afspraak in IJzendoorn, doorgaans binnen twee tot vijf werkdagen. We nemen persoonlijk contact met je op om een geschikt moment af te spreken.'
+  }
+  const address = [payloadString(payload, 'address'), [payloadString(payload, 'postalCode'), payloadString(payload, 'city')].filter(Boolean).join(' '), payloadString(payload, 'country') === 'NL' ? 'Nederland' : ''].filter(Boolean).join('\n')
+  return `Verzending binnen Nederland (€ 6,95).\nBezorgadres:\n${address}`
+}
+
 export const emailContent = (message: EmailMessage) => {
   if (message.type === 'withdrawal_received') {
     return withdrawalConfirmationContent({
@@ -56,11 +64,11 @@ export const emailContent = (message: EmailMessage) => {
   const content: Record<Exclude<EmailMessageType, 'withdrawal_received'>, { subject: string; text: string }> = {
     order_received: {
       subject: 'We hebben je bestelling ontvangen',
-      text: 'We hebben je bestelling ontvangen. Zodra de betaling is bevestigd, laten we je weten hoe het werk bij je komt.\n\nStilte & Draad · antwoord via marvinvanzanten77@gmail.com',
+      text: `We hebben je bestelling ontvangen. Zodra de betaling is bevestigd, laten we het weten.\n\n${purchaseDeliveryText(message.payload)}\n\nStilte & Draad · antwoord via marvinvanzanten77@gmail.com`,
     },
     payment_succeeded: {
       subject: 'Je betaling is ontvangen',
-      text: 'Je betaling is ontvangen. We nemen contact op over afhalen of, als dat voor dit werk is afgesproken, verzending.\n\nStilte & Draad · antwoord via marvinvanzanten77@gmail.com',
+      text: `Je betaling is ontvangen.\n\n${purchaseDeliveryText(message.payload)}\n\nStilte & Draad · antwoord via marvinvanzanten77@gmail.com`,
     },
     payment_failed_or_canceled: {
       subject: 'Je betaling is niet afgerond',

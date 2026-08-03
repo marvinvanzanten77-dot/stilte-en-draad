@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { configurationState, donationConfigurationState } from './config.js'
 import { mapStatus, synchronizePaymentWith } from './mollie.js'
-import { catalogItem, shippingFor, trustedItems, validateDonationAmount } from './orders.js'
+import { catalogItem, SHIPPING_COST_CENTS, shippingFor, trustedItems, validateDonationAmount } from './orders.js'
 import { hasInventoryConflict, keepTerminalStatus, type StoredOrder } from './store.js'
 import { checkoutSchema, processCheckout, type CheckoutDependencies } from '../checkout/create.js'
 import { donationSchema, processDonation, type DonationDependencies } from '../donations/create.js'
@@ -30,24 +30,41 @@ describe('betrouwbare productbron en productgereedheid', () => {
     expect(() => trustedItems([11])).toThrow('Ontbreekt: afmetingen')
   })
 
-  it('blokkeert verzending voordat een werk bestelbaar is', () => {
-    expect(() => shippingFor([1], {})).toThrow()
+  it('rekent verzending eenmaal per volledige bestelling', () => {
+    expect(shippingFor([2])).toBe(SHIPPING_COST_CENTS)
+    expect(shippingFor([2, 3])).toBe(SHIPPING_COST_CENTS)
   })
 })
 
 describe('invoervalidatie', () => {
-  it('accepteert geen clientprijs in het checkoutcontract', () => {
-    const parsed = checkoutSchema.parse({
+  it('weigert een clientprijs of client-verzendbedrag in het checkoutcontract', () => {
+    expect(() => checkoutSchema.parse({
       productIds: [1], fulfillment: 'pickup', name: 'Test Persoon', email: 'test@example.nl',
-      country: 'NL', idempotencyKey: '13ad03c7-8f80-4bbc-8d35-89da69781913', price: 1,
-    })
-    expect('price' in parsed).toBe(false)
+      idempotencyKey: '13ad03c7-8f80-4bbc-8d35-89da69781913', price: 1, shippingCents: 0,
+    })).toThrow()
   })
 
-  it('weigert verzending server-side', () => {
+  it('weigert verzending zonder volledig Nederlands adres', () => {
     expect(() => checkoutSchema.parse({
       productIds: [2], fulfillment: 'shipping', name: 'Test Persoon', email: 'test@example.nl',
       country: 'NL', idempotencyKey: crypto.randomUUID(),
+    })).toThrow()
+  })
+
+  it('accepteert afhalen zonder bezorgadres en verzending alleen naar Nederland', () => {
+    expect(checkoutSchema.parse({
+      productIds: [2], fulfillment: 'pickup', name: 'Test Persoon', email: 'test@example.nl',
+      idempotencyKey: crypto.randomUUID(),
+    }).fulfillment).toBe('pickup')
+    expect(checkoutSchema.parse({
+      productIds: [2], fulfillment: 'shipping', name: 'Test Persoon', email: 'test@example.nl',
+      street: 'Dorpsstraat', houseNumber: '2', postalCode: '4053JV', city: 'IJzendoorn', country: 'NL',
+      idempotencyKey: crypto.randomUUID(),
+    }).fulfillment).toBe('shipping')
+    expect(() => checkoutSchema.parse({
+      productIds: [2], fulfillment: 'shipping', name: 'Test Persoon', email: 'test@example.nl',
+      street: 'Rue Exemple', houseNumber: '2', postalCode: '75001', city: 'Paris', country: 'FR',
+      idempotencyKey: crypto.randomUUID(),
     })).toThrow()
   })
 
@@ -175,7 +192,7 @@ describe('volledige checkoutorkestratie met mocks', () => {
   const orderId = '11111111-1111-4111-8111-111111111111'
   const input = checkoutSchema.parse({
     productIds: [1], fulfillment: 'pickup', name: 'Test Persoon', email: 'test@example.nl',
-    country: 'NL', idempotencyKey: '13ad03c7-8f80-4bbc-8d35-89da69781913',
+    idempotencyKey: '13ad03c7-8f80-4bbc-8d35-89da69781913',
   })
 
   const dependencies = () => {
@@ -199,7 +216,7 @@ describe('volledige checkoutorkestratie met mocks', () => {
 
   it('maakt order, reservering, Mollie-betaling en koppeling in volgorde', async () => {
     const { deps, reserve, createPayment, savePayment } = dependencies()
-    const result = await processCheckout(input, { reservationMinutes: 15, shippingRates: {} }, deps)
+    const result = await processCheckout(input, { reservationMinutes: 15 }, deps)
     expect(result).toMatchObject({ created: true, orderId, checkoutUrl: 'https://pay.example/checkout' })
     expect(reserve).toHaveBeenCalledWith(expect.objectContaining({ subtotalCents: 8900, totalCents: 8900 }))
     expect(createPayment).toHaveBeenCalledOnce()
@@ -212,7 +229,7 @@ describe('volledige checkoutorkestratie met mocks', () => {
       id: 'order-1', order_number: 'SD-TEST', status: 'pending', checkout_url: 'https://pay.example/existing',
       qr_code_url: null,
     } as StoredOrder)
-    const result = await processCheckout(input, { reservationMinutes: 15, shippingRates: {} }, deps)
+    const result = await processCheckout(input, { reservationMinutes: 15 }, deps)
     expect(result.created).toBe(false)
     expect(result.checkoutUrl).toBe('https://pay.example/existing')
     expect(reserve).not.toHaveBeenCalled()
@@ -222,10 +239,31 @@ describe('volledige checkoutorkestratie met mocks', () => {
   it('hervat een draftorder met dezelfde Mollie-idempotency', async () => {
     const { deps, createPayment, savePayment } = dependencies()
     deps.findByKey = async () => ({ id: 'order-1', order_number: 'SD-TEST', status: 'draft', checkout_url: null } as StoredOrder)
-    const result = await processCheckout(input, { reservationMinutes: 15, shippingRates: {} }, deps)
+    const result = await processCheckout(input, { reservationMinutes: 15 }, deps)
     expect(result.created).toBe(false)
     expect(createPayment).toHaveBeenCalledOnce()
     expect(savePayment).toHaveBeenCalledOnce()
+  })
+
+  it('neemt exact eenmaal 695 cent mee in order- en Mollie-totaal', async () => {
+    const { deps, reserve, createPayment } = dependencies()
+    deps.shippingCost = () => 695
+    deps.itemsFor = () => [
+      { product: catalogItem(2)!, productId: 2, title: 'Dromen van Water', unitPriceCents: 6900, stock: 1 },
+      { product: catalogItem(3)!, productId: 3, title: 'Vrije Lucht', unitPriceCents: 7900, stock: 1 },
+    ]
+    deps.getOrderById = async () => ({ id: orderId, order_number: 'SD-TEST', total_cents: 15_495, kind: 'purchase' } as StoredOrder)
+    const shippingInput = checkoutSchema.parse({
+      productIds: [2, 3], fulfillment: 'shipping', name: 'Test Persoon', email: 'test@example.nl',
+      street: 'Dorpsstraat', houseNumber: '2', addition: 'A', postalCode: '4053JV', city: 'IJzendoorn', country: 'NL',
+      idempotencyKey: crypto.randomUUID(),
+    })
+    await processCheckout(shippingInput, { reservationMinutes: 15 }, deps)
+    expect(reserve).toHaveBeenCalledWith(expect.objectContaining({
+      subtotalCents: 14_800, shippingCents: 695, totalCents: 15_495, fulfillment: 'shipping',
+      customer: expect.objectContaining({ address: 'Dorpsstraat 2 A', postalCode: '4053 JV', city: 'IJzendoorn', country: 'NL' }),
+    }))
+    expect(createPayment).toHaveBeenCalledWith(expect.objectContaining({ total_cents: 15_495 }))
   })
 })
 

@@ -14,6 +14,10 @@ export type StoredOrder = {
   fulfillment: 'shipping' | 'pickup' | 'none'
   customer_name: string | null
   customer_email: string | null
+  address: string | null
+  postal_code: string | null
+  city: string | null
+  country: string | null
   anonymous: boolean
   mollie_payment_id: string | null
   checkout_url: string | null
@@ -146,17 +150,17 @@ export const createDonation = async (input: {
 
 export const attachPayment = async (orderId: string, paymentId: string, checkoutUrl: string, qrCodeUrl?: string) => {
   await db().begin(async (sql) => {
-    const updated = await sql<{ customer_email: string | null; kind: string }[]>`
+    const updated = await sql<Array<Pick<StoredOrder, 'customer_email' | 'kind' | 'fulfillment' | 'shipping_cents' | 'address' | 'postal_code' | 'city' | 'country'>>>`
       update orders set status = 'pending', mollie_payment_id = ${paymentId}, checkout_url = ${checkoutUrl},
         qr_code_url = ${qrCodeUrl ?? null}, updated_at = now()
       where id = ${orderId} and status = 'draft'
-      returning customer_email, kind
+      returning customer_email, kind, fulfillment, shipping_cents, address, postal_code, city, country
     `
     if (!updated.length) return
     await sql`insert into order_audit_log (order_id, event_type, from_status, to_status, reason) values (${orderId}, 'payment_created', 'draft', 'pending', 'mollie_payment_attached')`
     if (updated[0].kind === 'purchase' && updated[0].customer_email) {
       await sql`insert into email_outbox (order_id, message_type, recipient_email, payload)
-        values (${orderId}, 'order_received', ${updated[0].customer_email}, ${sql.json({ orderId })})
+        values (${orderId}, 'order_received', ${updated[0].customer_email}, ${sql.json({ orderId, fulfillment: updated[0].fulfillment, shippingCents: updated[0].shipping_cents, address: updated[0].address, postalCode: updated[0].postal_code, city: updated[0].city, country: updated[0].country })})
         on conflict (order_id, message_type) do nothing`
     }
   })
@@ -256,7 +260,7 @@ export const canResumePaymentCreation = async (order: StoredOrder) => {
 }
 
 export const applyPaymentStatus = async (orderId: string, status: OrderStatus) => db().begin(async (sql) => {
-  const [order] = await sql<{ status: OrderStatus; kind: string; customer_email: string | null }[]>`select status, kind, customer_email from orders where id = ${orderId} for update`
+  const [order] = await sql<Array<Pick<StoredOrder, 'status' | 'kind' | 'customer_email' | 'fulfillment' | 'shipping_cents' | 'address' | 'postal_code' | 'city' | 'country'>>>`select status, kind, customer_email, fulfillment, shipping_cents, address, postal_code, city, country from orders where id = ${orderId} for update`
   if (!order) return null
   if (keepTerminalStatus(order.status, status)) return order.status
 
@@ -293,7 +297,7 @@ export const applyPaymentStatus = async (orderId: string, status: OrderStatus) =
     await sql`update orders set status = 'paid', status_reason = null, payment_status_checked_at = now(), updated_at = now() where id = ${orderId}`
     await sql`insert into order_audit_log (order_id, event_type, from_status, to_status, reason) values (${orderId}, 'status_changed', ${order.status}, 'paid', 'verified_paid_payment')`
     if (order.customer_email) await sql`insert into email_outbox (order_id, message_type, recipient_email, payload)
-      values (${orderId}, 'payment_succeeded', ${order.customer_email}, ${sql.json({ orderId })})
+      values (${orderId}, 'payment_succeeded', ${order.customer_email}, ${sql.json({ orderId, fulfillment: order.fulfillment, shippingCents: order.shipping_cents, address: order.address, postalCode: order.postal_code, city: order.city, country: order.country })})
       on conflict (order_id, message_type) do nothing`
     return 'paid' as OrderStatus
   }

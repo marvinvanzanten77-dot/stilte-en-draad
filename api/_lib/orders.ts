@@ -15,6 +15,8 @@ export const validateDonationAmount = (amountCents: number, minimumCents: number
   return true
 }
 
+export const SHIPPING_COST_CENTS = 695
+
 export const trustedItems = (productIds: number[]) => {
   const uniqueIds = [...new Set(productIds)]
   if (uniqueIds.length !== productIds.length) throw new Error('CHECKOUT:Een uniek werk kan maar eenmaal in de winkelmand staan.')
@@ -31,16 +33,10 @@ export const trustedItems = (productIds: number[]) => {
   })
 }
 
-export const shippingFor = (productIds: number[], rates: Record<string, number>) => {
+export const shippingFor = (productIds: number[]) => {
   const selected = trustedItems(productIds)
-  if (selected.some(({ product }) => !product.shippingAllowed)) throw new Error('CHECKOUT:Een gekozen werk kan nog niet worden verzonden.')
-  const classes = selected.map(({ product }) => product.shippingClass)
-  if (classes.some((shippingClass) => !shippingClass)) {
-    throw new Error('CHECKOUT:Verzending wordt beschikbaar zodra afmetingen, gewicht en verzendklasse zijn bevestigd. Kies voorlopig ophalen.')
-  }
-  const missingRate = classes.find((shippingClass) => rates[shippingClass!] === undefined)
-  if (missingRate) throw new Error('CHECKOUT:Voor een gekozen werk ontbreekt nog een verzendtarief.')
-  return Math.max(...classes.map((shippingClass) => rates[shippingClass!]!))
+  if (selected.some(({ product }) => !product.shippingAllowed)) throw new Error('CHECKOUT:Een gekozen werk kan niet worden verzonden.')
+  return SHIPPING_COST_CENTS
 }
 
 export const pickupAllowedFor = (productIds: number[]) => {

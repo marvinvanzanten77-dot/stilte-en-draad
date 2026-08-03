@@ -7,22 +7,30 @@ import { newOrderIdentity, pickupAllowedFor, shippingFor, trustedItems } from '.
 import { attachPayment, canResumePaymentCreation, createPurchaseReservation, findByIdempotencyKey, getOrder } from '../_lib/store.js'
 import type { StoredOrder } from '../_lib/store.js'
 
-export const checkoutSchema = z.object({
+const checkoutBase = z.strictObject({
   productIds: z.array(z.number().int().positive()).min(1).max(24),
-  fulfillment: z.literal('pickup'),
   name: z.string().trim().min(2).max(120),
   email: z.email().max(254),
   phone: z.string().trim().max(40).optional().default(''),
-  address: z.string().trim().max(160).optional().default(''),
-  postalCode: z.string().trim().max(20).optional().default(''),
-  city: z.string().trim().max(100).optional().default(''),
-  country: z.string().trim().length(2).transform((value) => value.toUpperCase()).default('NL'),
   message: z.string().trim().max(500).optional().default(''),
   idempotencyKey: z.uuid(),
 })
+const dutchPostalCode = z.string().trim().toUpperCase().regex(/^\d{4}\s?[A-Z]{2}$/, 'Vul een geldige Nederlandse postcode in.')
+export const checkoutSchema = z.discriminatedUnion('fulfillment', [
+  checkoutBase.extend({ fulfillment: z.literal('pickup') }),
+  checkoutBase.extend({
+    fulfillment: z.literal('shipping'),
+    street: z.string().trim().min(2).max(120),
+    houseNumber: z.string().trim().min(1).max(12),
+    addition: z.string().trim().max(12).optional().default(''),
+    postalCode: dutchPostalCode,
+    city: z.string().trim().min(2).max(100),
+    country: z.literal('NL'),
+  }),
+])
 export type CheckoutInput = z.infer<typeof checkoutSchema>
 
-type CheckoutConfig = { reservationMinutes: number; shippingRates: Record<string, number> }
+type CheckoutConfig = { reservationMinutes: number }
 export type CheckoutDependencies = {
   findByKey: typeof findByIdempotencyKey
   canResume: typeof canResumePaymentCreation
@@ -55,15 +63,15 @@ export const processCheckout = async (input: CheckoutInput, config: CheckoutConf
 
   const items = dependencies.itemsFor(input.productIds)
   const subtotalCents = items.reduce((total, item) => total + item.unitPriceCents, 0)
-  const shippingCents = 0
-  dependencies.validatePickup(input.productIds)
+  const shippingCents = input.fulfillment === 'shipping' ? dependencies.shippingCost(input.productIds) : 0
+  if (input.fulfillment === 'pickup') dependencies.validatePickup(input.productIds)
   const { id, orderNumber } = dependencies.identity('SD')
   const customer = {
     name: input.name, email: input.email.toLowerCase(), phone: input.phone || null,
-    address: null,
-    postalCode: null,
-    city: null,
-    country: null,
+    address: input.fulfillment === 'shipping' ? `${input.street} ${input.houseNumber}${input.addition ? ` ${input.addition}` : ''}` : null,
+    postalCode: input.fulfillment === 'shipping' ? input.postalCode.replace(/\s/g, '').replace(/^(\d{4})([A-Z]{2})$/, '$1 $2') : null,
+    city: input.fulfillment === 'shipping' ? input.city : null,
+    country: input.fulfillment === 'shipping' ? 'NL' : null,
     message: input.message || null,
   }
   const created = await dependencies.reserve({

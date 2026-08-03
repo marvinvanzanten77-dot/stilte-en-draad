@@ -59,6 +59,17 @@ describe('e-mail-outbox', () => {
     }
   })
 
+  it('neemt verzendadres of afhaalafspraak op in aankoopmails', () => {
+    const shipping = emailContent({
+      ...message,
+      payload: { fulfillment: 'shipping', shippingCents: 695, address: 'Dorpsstraat 2 A', postalCode: '4053 JV', city: 'IJzendoorn', country: 'NL' },
+    })
+    expect(shipping.text).toContain('€ 6,95')
+    expect(shipping.text).toContain('Dorpsstraat 2 A\n4053 JV IJzendoorn\nNederland')
+    const pickup = emailContent({ ...message, payload: { fulfillment: 'pickup', shippingCents: 0 } })
+    expect(pickup.text).toContain('Afhalen op afspraak in IJzendoorn')
+  })
+
   it('houdt de provider uitgeschakeld zonder complete expliciete configuratie', () => {
     expect(emailConfigurationState().ready).toBe(false)
     expect(() => createResendProvider()).toThrow('EMAIL_NOT_CONFIGURED')

@@ -311,7 +311,7 @@ export const applyPaymentStatus = async (orderId: string, status: OrderStatus) =
   }
   const messageType = order.kind === 'donation' && status === 'paid'
     ? 'donation_confirmed'
-    : ['failed', 'canceled'].includes(status) ? 'payment_failed_or_canceled'
+    : ['failed', 'canceled', 'expired'].includes(status) ? 'payment_failed_or_canceled'
       : status === 'paid' ? 'payment_succeeded' : null
   if (messageType && order.customer_email) await sql`insert into email_outbox (order_id, message_type, recipient_email, payload)
     values (${orderId}, ${messageType}, ${order.customer_email}, ${sql.json({ orderId })})

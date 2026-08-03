@@ -22,7 +22,7 @@ const suite = enabled ? describe.sequential : describe.skip
 suite('echte PostgreSQL-database-, voorraad- en concurrencylogica', () => {
   const sql = postgres(process.env.DATABASE_URL!, { max: 6, prepare: false })
   const migrationSql = postgres(process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL!, { max: 1, prepare: false })
-  const productIds = [9_900_026, 9_900_027, 9_900_028]
+  const productIds = [9_900_026, 9_900_027, 9_900_028, 9_900_029]
   const orderIds = [
     '00000000-0000-4000-8000-000000000261',
     '00000000-0000-4000-8000-000000000262',
@@ -64,7 +64,7 @@ suite('echte PostgreSQL-database-, voorraad- en concurrencylogica', () => {
       name: 'Database Test', email: 'database-test@example.nl', phone: null, address: null,
       postalCode: null, city: null, country: null, message: null,
     },
-    items: [{ productId, title: 'Concurrency-testwerk', unitPriceCents: 100 }],
+    items: [{ productId, title: 'Concurrency-testwerk', unitPriceCents: 100, stock: 1 }],
     reservationMinutes: 15,
   })
 
@@ -184,6 +184,20 @@ suite('echte PostgreSQL-database-, voorraad- en concurrencylogica', () => {
       select sold_order_id from product_inventory where product_id = ${productIds[1]}
     `
     expect(inventory.sold_order_id).toBe(orderIds[6])
+  })
+
+  it('houdt een tweede exemplaar beschikbaar na de eerste verkoop', async () => {
+    const productId = productIds[3]
+    const first = createPurchaseReservation({
+      id: orderIds[7], orderNumber: 'TEST-STOCK-2-A', idempotencyKey: 'test-stock-2-a',
+      subtotalCents: 100, shippingCents: 0, totalCents: 100, fulfillment: 'pickup',
+      customer: { name: 'Database Test', email: 'database-test@example.nl', phone: null, address: null, postalCode: null, city: null, country: null, message: null },
+      items: [{ productId, title: 'Werk met twee exemplaren', unitPriceCents: 100, stock: 2 }], reservationMinutes: 15,
+    })
+    expect(await first).toBe(true)
+    expect(await applyPaymentStatus(orderIds[7], 'paid')).toBe('paid')
+    const [afterFirst] = await sql<{ stock: number; sold_at: Date | null }[]>`select stock, sold_at from product_inventory where product_id = ${productId}`
+    expect(afterFirst).toEqual({ stock: 1, sold_at: null })
   })
 
   it('maakt een herroepingsverzoek idempotent aan en verwerkt de bevestiging via de outbox', async () => {

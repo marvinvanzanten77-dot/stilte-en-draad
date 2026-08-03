@@ -18,7 +18,7 @@ export type StoredOrder = {
   mollie_payment_id: string | null
   checkout_url: string | null
   qr_code_url: string | null
-  items: Array<{ productId: number; title: string; unitPriceCents: number }>
+  items: Array<{ productId: number; title: string; unitPriceCents: number; stock?: number }>
 }
 
 let client: ReturnType<typeof postgres> | null = null
@@ -78,18 +78,18 @@ export const createPurchaseReservation = async (input: {
   totalCents: number
   fulfillment: 'shipping' | 'pickup'
   customer: Record<string, string | null>
-  items: Array<{ productId: number; title: string; unitPriceCents: number }>
+  items: Array<{ productId: number; title: string; unitPriceCents: number; stock: number }>
   reservationMinutes: number
 }) => db().begin(async (sql) => {
   const existing = await sql<{ id: string }[]>`select id from orders where idempotency_key = ${input.idempotencyKey}`
   if (existing.length) return false
 
   for (const item of input.items) {
-    await sql`insert into product_inventory (product_id, stock) values (${item.productId}, 1) on conflict (product_id) do nothing`
-    const [inventory] = await sql<{ sold_at: Date | null; reserved_order_id: string | null; reserved_until: Date | null }[]>`
-      select sold_at, reserved_order_id, reserved_until from product_inventory where product_id = ${item.productId} for update
+    await sql`insert into product_inventory (product_id, stock) values (${item.productId}, ${item.stock ?? 1}) on conflict (product_id) do nothing`
+    const [inventory] = await sql<{ stock: number; sold_at: Date | null; reserved_order_id: string | null; reserved_until: Date | null }[]>`
+      select stock, sold_at, reserved_order_id, reserved_until from product_inventory where product_id = ${item.productId} for update
     `
-    if (inventory.sold_at) throw new Error(`CHECKOUT:${item.title} heeft al een thuis gevonden.`)
+    if (inventory.stock < 1 || inventory.sold_at) throw new Error(`CHECKOUT:${item.title} heeft al een thuis gevonden.`)
     if (inventory.reserved_order_id && inventory.reserved_until && inventory.reserved_until > new Date()) {
       throw new Error(`CHECKOUT:${item.title} wordt tijdelijk voor iemand anders bewaard.`)
     }
@@ -248,7 +248,7 @@ export const canResumePaymentCreation = async (order: StoredOrder) => {
   if (order.kind === 'donation') return order.status === 'draft'
   if (order.status !== 'draft') return false
   const [result] = await db()<Array<{ valid: boolean }>>`
-    select bool_and(pi.reserved_order_id = ${order.id} and pi.reserved_until > now() and pi.sold_order_id is null) as valid
+    select bool_and(pi.stock > 0 and pi.reserved_order_id = ${order.id} and pi.reserved_until > now() and pi.sold_order_id is null) as valid
     from order_items oi join product_inventory pi on pi.product_id = oi.product_id
     where oi.order_id = ${order.id}
   `
@@ -265,8 +265,8 @@ export const applyPaymentStatus = async (orderId: string, status: OrderStatus) =
     for (const item of items) {
       await sql`insert into product_inventory (product_id, stock) values (${item.product_id}, 1) on conflict (product_id) do nothing`
     }
-    const inventory = await sql<{ product_id: number; reserved_order_id: string | null; reserved_until: Date | null; sold_order_id: string | null }[]>`
-      select product_id, reserved_order_id, reserved_until, sold_order_id
+    const inventory = await sql<{ product_id: number; stock: number; reserved_order_id: string | null; reserved_until: Date | null; sold_order_id: string | null }[]>`
+      select product_id, stock, reserved_order_id, reserved_until, sold_order_id
       from product_inventory where product_id in ${sql(items.map((item) => item.product_id))}
       order by product_id for update
     `
@@ -280,7 +280,15 @@ export const applyPaymentStatus = async (orderId: string, status: OrderStatus) =
         on conflict (order_id, message_type) do nothing`
       return 'payment_review' as OrderStatus
     }
-    await sql`update product_inventory set sold_order_id = ${orderId}, sold_at = now(), reserved_order_id = null, reserved_until = null where product_id in ${sql(items.map((item) => item.product_id))}`
+    await sql`
+      update product_inventory set
+        stock = stock - 1,
+        sold_order_id = case when stock - 1 = 0 then ${orderId}::uuid else null end,
+        sold_at = case when stock - 1 = 0 then now() else null end,
+        reserved_order_id = null,
+        reserved_until = null
+      where product_id in ${sql(items.map((item) => item.product_id))} and stock > 0
+    `
     for (const item of items) await sql`insert into inventory_audit_log (product_id, order_id, event_type, reason) values (${item.product_id}, ${orderId}, 'sold', 'verified_paid_payment')`
     await sql`update orders set status = 'paid', status_reason = null, payment_status_checked_at = now(), updated_at = now() where id = ${orderId}`
     await sql`insert into order_audit_log (order_id, event_type, from_status, to_status, reason) values (${orderId}, 'status_changed', ${order.status}, 'paid', 'verified_paid_payment')`
@@ -317,12 +325,12 @@ export const getProductAvailability = async (productIds: number[]) => {
     await transaction`update product_inventory set reserved_order_id = null, reserved_until = null where sold_at is null and reserved_until <= now()`
     for (const item of expired) await transaction`insert into inventory_audit_log (product_id, order_id, event_type, reason) values (${item.product_id}, ${item.reserved_order_id}, 'released', 'reservation_expired')`
   })
-  const rows = await sql<{ product_id: number; sold_at: Date | null; reserved_until: Date | null }[]>`
-    select product_id, sold_at, reserved_until from product_inventory where product_id in ${sql(productIds)}
+  const rows = await sql<{ product_id: number; stock: number; sold_at: Date | null; reserved_until: Date | null }[]>`
+    select product_id, stock, sold_at, reserved_until from product_inventory where product_id in ${sql(productIds)}
   `
   return Object.fromEntries(productIds.map((id) => {
     const row = rows.find((candidate) => candidate.product_id === id)
-    const status = row?.sold_at ? 'sold' : row?.reserved_until && row.reserved_until > new Date() ? 'reserved' : 'available'
+    const status = (row && row.stock < 1) || row?.sold_at ? 'sold' : row?.reserved_until && row.reserved_until > new Date() ? 'reserved' : 'available'
     return [id, status]
   }))
 }

@@ -27,7 +27,7 @@ export const trustedItems = (productIds: number[]) => {
     if (product.readiness !== 'purchasable' || missing.length) {
       throw new Error(`CHECKOUT:${product.title} is nog niet bestelbaar. Ontbreekt: ${missing.join(', ') || 'vrijgave als purchasable'}.`)
     }
-    return { product, productId: product.id, title: product.title, unitPriceCents: product.price * 100 }
+    return { product, productId: product.id, title: product.title, unitPriceCents: product.price * 100, stock: product.stock }
   })
 }
 

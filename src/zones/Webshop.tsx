@@ -108,6 +108,7 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
                 <span className="uppercase tracking-[0.14em] text-neutral-500">Totaal</span>
                 <strong>{formatCents(cartTotalCents)}</strong>
               </div>
+              <p className="text-xs leading-5 text-neutral-600">Afhalen op afspraak in IJzendoorn, doorgaans binnen twee tot vijf werkdagen. Verzending is nog niet beschikbaar.</p>
               <button type="button" onClick={() => { setCartOpen(false); navigate('/checkout') }} className="w-full rounded-full bg-neutral-900 px-5 py-3.5 text-xs uppercase tracking-[0.16em] text-white">Naar veilig afrekenen</button>
               <p className="mt-2 rounded-full border border-neutral-800/15 px-5 py-3 text-center text-xs uppercase tracking-[0.16em] text-neutral-600">Je selectie wordt op dit apparaat bewaard</p>
             </div>

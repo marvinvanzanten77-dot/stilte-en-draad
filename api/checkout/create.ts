@@ -9,7 +9,7 @@ import type { StoredOrder } from '../_lib/store.js'
 
 export const checkoutSchema = z.object({
   productIds: z.array(z.number().int().positive()).min(1).max(24),
-  fulfillment: z.enum(['shipping', 'pickup']),
+  fulfillment: z.literal('pickup'),
   name: z.string().trim().min(2).max(120),
   email: z.email().max(254),
   phone: z.string().trim().max(40).optional().default(''),
@@ -19,12 +19,6 @@ export const checkoutSchema = z.object({
   country: z.string().trim().length(2).transform((value) => value.toUpperCase()).default('NL'),
   message: z.string().trim().max(500).optional().default(''),
   idempotencyKey: z.uuid(),
-}).superRefine((data, context) => {
-  if (data.fulfillment === 'shipping') {
-    if (!data.address) context.addIssue({ code: 'custom', path: ['address'], message: 'Vul een adres in.' })
-    if (!data.postalCode) context.addIssue({ code: 'custom', path: ['postalCode'], message: 'Vul een postcode in.' })
-    if (!data.city) context.addIssue({ code: 'custom', path: ['city'], message: 'Vul een woonplaats in.' })
-  }
 })
 export type CheckoutInput = z.infer<typeof checkoutSchema>
 
@@ -61,15 +55,15 @@ export const processCheckout = async (input: CheckoutInput, config: CheckoutConf
 
   const items = dependencies.itemsFor(input.productIds)
   const subtotalCents = items.reduce((total, item) => total + item.unitPriceCents, 0)
-  const shippingCents = input.fulfillment === 'shipping' ? dependencies.shippingCost(input.productIds, config.shippingRates) : 0
-  if (input.fulfillment === 'pickup') dependencies.validatePickup(input.productIds)
+  const shippingCents = 0
+  dependencies.validatePickup(input.productIds)
   const { id, orderNumber } = dependencies.identity('SD')
   const customer = {
     name: input.name, email: input.email.toLowerCase(), phone: input.phone || null,
-    address: input.fulfillment === 'shipping' ? input.address : null,
-    postalCode: input.fulfillment === 'shipping' ? input.postalCode.toUpperCase() : null,
-    city: input.fulfillment === 'shipping' ? input.city : null,
-    country: input.fulfillment === 'shipping' ? input.country : null,
+    address: null,
+    postalCode: null,
+    city: null,
+    country: null,
     message: input.message || null,
   }
   const created = await dependencies.reserve({

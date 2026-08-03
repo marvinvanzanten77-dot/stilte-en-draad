@@ -3,9 +3,16 @@ import { products } from './products'
 import { productReadinessIssues } from './productReadiness'
 
 describe('productgereedheid', () => {
-  it('houdt alle niet-verkochte werken bewust op display_only', () => {
-    expect(products.filter((product) => product.status !== 'verkocht').every((product) => product.readiness === 'display_only')).toBe(true)
+  it('maakt alleen complete, zelfstandige cataloguswerken bestelbaar', () => {
+    expect(products.filter((product) => product.readiness === 'purchasable').every((product) => product.status === 'beschikbaar' && productReadinessIssues(product).length === 0 && product.duplicateOfProductId === null)).toBe(true)
     expect(products.filter((product) => product.status === 'verkocht').every((product) => product.readiness === 'sold')).toBe(true)
+    expect(products.filter((product) => product.unique && product.readiness === 'purchasable').every((product) => product.stock === 1)).toBe(true)
+  })
+
+  it('blokkeert onvolledige en dubbele vermeldingen', () => {
+    expect(products.find((product) => product.id === 11)?.readiness).toBe('display_only')
+    expect(products.find((product) => product.id === 14)?.readiness).toBe('display_only')
+    expect(products.find((product) => product.id === 23)?.readiness).toBe('display_only')
   })
 
   it('rapporteert ontbrekende velden exact per werk', () => {

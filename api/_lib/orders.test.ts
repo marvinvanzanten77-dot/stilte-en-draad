@@ -27,7 +27,7 @@ describe('betrouwbare productbron en productgereedheid', () => {
   })
 
   it('houdt een incompleet tentoonstellingswerk uit de checkout', () => {
-    expect(() => trustedItems([3])).toThrow('Ontbreekt: vrijgave als purchasable')
+    expect(() => trustedItems([11])).toThrow('Ontbreekt: afmetingen')
   })
 
   it('blokkeert verzending voordat een werk bestelbaar is', () => {
@@ -42,6 +42,13 @@ describe('invoervalidatie', () => {
       country: 'NL', idempotencyKey: '13ad03c7-8f80-4bbc-8d35-89da69781913', price: 1,
     })
     expect('price' in parsed).toBe(false)
+  })
+
+  it('weigert verzending server-side', () => {
+    expect(() => checkoutSchema.parse({
+      productIds: [2], fulfillment: 'shipping', name: 'Test Persoon', email: 'test@example.nl',
+      country: 'NL', idempotencyKey: crypto.randomUUID(),
+    })).toThrow()
   })
 
   it('weigert ongeldige donaties', () => {
@@ -183,7 +190,7 @@ describe('volledige checkoutorkestratie met mocks', () => {
       createPayment,
       savePayment,
       identity: () => ({ id: orderId, orderNumber: 'SD-TEST' }),
-      itemsFor: () => [{ product: catalogItem(1)!, productId: 1, title: 'Zacht Begin', unitPriceCents: 8900 }],
+      itemsFor: () => [{ product: catalogItem(1)!, productId: 1, title: 'Zacht Begin', unitPriceCents: 8900, stock: 1 }],
       shippingCost: () => 0,
       validatePickup: () => undefined,
     }

@@ -24,10 +24,14 @@ export interface EmailOutboxRepository {
   failed(outboxId: number, retryAt: Date, errorCode: string): Promise<void>
 }
 
+const emailSignature = 'Stilte & Draad · project van Innerverse Studio · antwoord via marvinvanzanten77@gmail.com'
+
 export const withdrawalConfirmationContent = (payload: {
   requestNumber: string
   receivedAt: string
   scope: 'full' | 'partial'
+  fulfillment?: 'pickup' | 'shipping'
+  shippingCents?: number
 }) => ({
   subject: `Ontvangstbevestiging herroeping ${payload.requestNumber}`,
   text: [
@@ -35,9 +39,10 @@ export const withdrawalConfirmationContent = (payload: {
     `Referentie: ${payload.requestNumber}`,
     `Ontvangen op: ${payload.receivedAt}`,
     `Omvang: ${payload.scope === 'full' ? 'gehele bestelling' : 'deel van de bestelling'}`,
+    payload.fulfillment === 'shipping' ? `Oorspronkelijke ontvangst: verzending binnen Nederland (${payload.shippingCents === 695 ? '€ 6,95' : 'verzendkosten volgens bestelling'})` : 'Oorspronkelijke ontvangst: afhalen in IJzendoorn',
     '',
     'Bewaar deze bevestiging. We nemen contact op met de retourinstructies.',
-    'Stilte & Draad · antwoord via marvinvanzanten77@gmail.com',
+    emailSignature,
   ].join('\n'),
 })
 
@@ -58,29 +63,31 @@ export const emailContent = (message: EmailMessage) => {
       requestNumber: payloadString(message.payload, 'requestNumber') || 'onbekend',
       receivedAt: payloadString(message.payload, 'receivedAt') || new Date().toISOString(),
       scope: message.payload.scope === 'partial' ? 'partial' : 'full',
+      fulfillment: message.payload.fulfillment === 'shipping' ? 'shipping' : 'pickup',
+      shippingCents: typeof message.payload.shippingCents === 'number' ? message.payload.shippingCents : 0,
     })
   }
 
   const content: Record<Exclude<EmailMessageType, 'withdrawal_received'>, { subject: string; text: string }> = {
     order_received: {
       subject: 'We hebben je bestelling ontvangen',
-      text: `We hebben je bestelling ontvangen. Zodra de betaling is bevestigd, laten we het weten.\n\n${purchaseDeliveryText(message.payload)}\n\nStilte & Draad · antwoord via marvinvanzanten77@gmail.com`,
+      text: `We hebben je bestelling ontvangen. Zodra de betaling is bevestigd, laten we het weten.\n\n${purchaseDeliveryText(message.payload)}\n\n${emailSignature}`,
     },
     payment_succeeded: {
       subject: 'Je betaling is ontvangen',
-      text: `Je betaling is ontvangen.\n\n${purchaseDeliveryText(message.payload)}\n\nStilte & Draad · antwoord via marvinvanzanten77@gmail.com`,
+      text: `Je betaling is ontvangen.\n\n${purchaseDeliveryText(message.payload)}\n\n${emailSignature}`,
     },
     payment_failed_or_canceled: {
       subject: 'Je betaling is niet afgerond',
-      text: 'Je betaling is niet afgerond. Er is niets definitief besteld. Neem gerust contact op als je hulp nodig hebt.\n\nStilte & Draad · antwoord via marvinvanzanten77@gmail.com',
+      text: `Je betaling is niet afgerond. Er is niets definitief besteld. Neem gerust contact op als je hulp nodig hebt.\n\n${emailSignature}`,
     },
     payment_review: {
       subject: 'We controleren je betaling persoonlijk',
-      text: 'Je betaling vraagt om een handmatige controle. We nemen persoonlijk contact op voordat er iets met je bestelling gebeurt.\n\nStilte & Draad · antwoord via marvinvanzanten77@gmail.com',
+      text: `Je betaling vraagt om een handmatige controle. We nemen persoonlijk contact op voordat er iets met je bestelling gebeurt.\n\n${emailSignature}`,
     },
     donation_confirmed: {
       subject: 'Dank je voor je bijdrage aan het rijdende atelier',
-      text: 'Dank je voor je bijdrage. Je helpt mee aan de aanschaf en verbouwing van de bus waarmee Stilte & Draad naar markten en festivals kan reizen.\n\nStilte & Draad · antwoord via marvinvanzanten77@gmail.com',
+      text: `Dank je voor je bijdrage. Je helpt mee aan de aanschaf en verbouwing van de bus waarmee Stilte & Draad naar markten en festivals kan reizen.\n\n${emailSignature}`,
     },
   }
   return content[message.type]

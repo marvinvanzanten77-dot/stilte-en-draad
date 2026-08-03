@@ -205,8 +205,8 @@ export const createWithdrawalRequest = async (input: {
   `
   if (existing.length) return existing[0]
 
-  const [order] = await sql<Array<{ id: string; customer_email: string | null }>>`
-    select id, customer_email from orders
+  const [order] = await sql<Array<{ id: string; customer_email: string | null; fulfillment: 'pickup' | 'shipping'; shipping_cents: number; address: string | null; postal_code: string | null; city: string | null; country: string | null }>>`
+    select id, customer_email, fulfillment, shipping_cents, address, postal_code, city, country from orders
     where upper(order_number) = upper(${input.orderNumber})
       and lower(customer_email) = lower(${input.email})
       and kind = 'purchase'
@@ -237,7 +237,7 @@ export const createWithdrawalRequest = async (input: {
     insert into email_outbox (order_id, message_type, recipient_email, payload)
     values (
       ${order.id}, 'withdrawal_received', ${order.customer_email},
-      ${sql.json({ requestNumber: input.requestNumber, scope: input.scope, receivedAt: request.received_at.toISOString() })}
+      ${sql.json({ requestNumber: input.requestNumber, scope: input.scope, receivedAt: request.received_at.toISOString(), fulfillment: order.fulfillment, shippingCents: order.shipping_cents, address: order.address, postalCode: order.postal_code, city: order.city, country: order.country })}
     )
     on conflict (order_id, message_type) do update set
       payload = excluded.payload,

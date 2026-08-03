@@ -7,6 +7,7 @@ import { newOrderIdentity } from '../_lib/orders.js'
 import { attachPayment, canResumePaymentCreation, createDonation, findByIdempotencyKey, getOrder } from '../_lib/store.js'
 import type { StoredOrder } from '../_lib/store.js'
 import { formatCents } from '../../src/utils/money.js'
+import { processPendingEmailsSafely } from '../_lib/email-dispatch.js'
 
 export const donationSchema = z.object({
   amountCents: z.number().int().positive(),
@@ -95,6 +96,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
       }
       throw error
     }
+    await processPendingEmailsSafely()
     return json(response, result.created ? 201 : 200, result)
   } catch (error) {
     return safeError(response, error)

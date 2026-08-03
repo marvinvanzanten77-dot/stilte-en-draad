@@ -3,6 +3,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { z } from 'zod'
 import { enforceOrigin, enforceRateLimit, json, method, safeError } from '../_lib/http.js'
 import { createWithdrawalRequest } from '../_lib/store.js'
+import { processPendingEmailsSafely } from '../_lib/email-dispatch.js'
 
 const schema = z.object({
   orderNumber: z.string().trim().min(8).max(80),
@@ -34,6 +35,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
       scope: input.scope,
       itemDescription: input.itemDescription || null,
     })
+    await processPendingEmailsSafely()
     return json(response, 201, {
       requestNumber: result.request_number,
       receivedAt: result.received_at,

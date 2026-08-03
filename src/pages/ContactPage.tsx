@@ -14,13 +14,15 @@ const ContactPage = () => (
         <a className="mt-2 inline-block text-base underline decoration-neutral-800/25 underline-offset-4 hover:decoration-neutral-800" href={`mailto:${siteDetails.email}`}>
           {siteDetails.email}
         </a>
-        <p className="mt-4 text-xs text-neutral-500">Stilte &amp; Draad · door {siteDetails.owner}</p>
-        <p className="text-xs text-neutral-500">KvK {siteDetails.chamberOfCommerce}</p>
+        <p className="mt-4 text-xs text-neutral-500">Stilte &amp; Draad · maker en verteller: {siteDetails.maker}</p>
+        <p className="text-xs text-neutral-500">Verkoper: {siteDetails.legalOwner} · {siteDetails.legalEntity}</p>
+        <p className="text-xs text-neutral-500">KvK {siteDetails.chamberOfCommerce} · btw-ID {siteDetails.vatNumber}</p>
         <address className="mt-3 text-xs not-italic text-neutral-500">
           {siteDetails.address.street}<br />
           {siteDetails.address.postalCode} {siteDetails.address.city}<br />
           {siteDetails.address.country}
         </address>
+        <p className="mt-3 text-xs text-neutral-500">Afhalen vindt uitsluitend op afspraak plaats in {siteDetails.pickupLocation}; dit is niet het zakelijke vestigingsadres.</p>
       </section>
     </div>
   </article>

@@ -6,6 +6,7 @@ import { createMolliePayment } from '../_lib/mollie.js'
 import { newOrderIdentity, pickupAllowedFor, shippingFor, trustedItems } from '../_lib/orders.js'
 import { attachPayment, canResumePaymentCreation, createPurchaseReservation, findByIdempotencyKey, getOrder } from '../_lib/store.js'
 import type { StoredOrder } from '../_lib/store.js'
+import { processPendingEmailsSafely } from '../_lib/email-dispatch.js'
 
 const checkoutBase = z.strictObject({
   productIds: z.array(z.number().int().positive()).min(1).max(24),
@@ -98,6 +99,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
     if (!await enforceRateLimit(request, response, 'checkout')) return
     const input = checkoutSchema.parse(request.body)
     const result = await processCheckout(input, config)
+    await processPendingEmailsSafely()
     return json(response, result.created ? 201 : 200, result)
   } catch (error) {
     return safeError(response, error)

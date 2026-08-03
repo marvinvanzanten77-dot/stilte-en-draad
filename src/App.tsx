@@ -17,11 +17,21 @@ import ContactPage from './pages/ContactPage'
 import { siteDetails } from './data/siteDetails'
 import WithdrawalPage from './pages/WithdrawalPage'
 import GlobalCart from './components/GlobalCart'
+import NotFoundPage from './pages/NotFoundPage'
 
 const zoneIds = new Set(zones.map((zone) => zone.id))
 const pathForZone = (zone: ZoneId) => zone === 'de-eerste-draad' ? '/' : `/${zone}`
 const siteUrl = siteDetails.url
 const defaultDescription = 'Autobiografische textielkunst, verhalen en spoken word van Jannie van Zanten.'
+const standalonePaths = new Set(['/contact', '/privacy', '/algemene-voorwaarden', '/herroepen', '/checkout', '/doneren'])
+const knownPath = (path: string) => {
+  if (path === '/' || standalonePaths.has(path)) return true
+  const [, routeType, slug] = path.split('/')
+  if (zoneIds.has(routeType as ZoneId) && !slug) return true
+  if ((routeType === 'werk' || routeType === 'certificaat') && slug && !path.split('/')[3]) return Boolean(getProduct(slug))
+  if (routeType === 'betaling' && slug && !path.split('/')[3]) return true
+  return false
+}
 
 const setMeta = (selector: string, attributes: Record<string, string>) => {
   let element = document.head.querySelector<HTMLMetaElement>(selector)
@@ -44,10 +54,15 @@ function AppContent() {
     let description = defaultDescription
     let image = `${siteUrl}/mood-board/Golden_Atelier_Morning.png`
     const [, routeType, slug] = path.split('/')
-    const standaloneRoute = path === '/contact' || path === '/privacy' || path === '/algemene-voorwaarden' || path === '/herroepen' || path === '/checkout' || path === '/doneren' || path.startsWith('/betaling/')
-    if (path === '/contact') {
+    const standaloneRoute = standalonePaths.has(path) || path.startsWith('/betaling/')
+    const notFound = !knownPath(path)
+    if (notFound) {
+      title = 'Pagina niet gevonden · Stilte & Draad'
+      description = 'Deze pagina bestaat niet. Keer terug naar het begin van Stilte & Draad.'
+    }
+    else if (path === '/contact') {
       title = 'Contact · Stilte & Draad'
-      description = `Neem contact op met ${siteDetails.name}, het atelier van ${siteDetails.owner}.`
+      description = `Neem contact op met ${siteDetails.name}, het textielproject van maker ${siteDetails.maker}.`
     }
     else if (path === '/privacy') title = 'Privacy · Stilte & Draad'
     else if (path === '/algemene-voorwaarden') title = 'Algemene voorwaarden · Stilte & Draad'
@@ -58,14 +73,14 @@ function AppContent() {
     else if (path === '/checkout') title = 'Veilig afrekenen · Stilte & Draad'
     else if (path === '/doneren') title = 'Doneer aan het rijdende atelier · Stilte & Draad'
     else if (path.startsWith('/betaling/')) title = 'Betalingsstatus · Stilte & Draad'
-    if ((routeType === 'werk' || routeType === 'certificaat') && slug) {
+    if (!notFound && (routeType === 'werk' || routeType === 'certificaat') && slug) {
       const product = getProduct(slug)
       if (product) {
         title = `${product.title} · Stilte & Draad`
         description = `${product.description} Handgemaakt, uniek werk van Jannie van Zanten.`
         image = new URL(productImage(product), siteUrl).href
       }
-    } else if (!standaloneRoute) {
+    } else if (!notFound && !standaloneRoute) {
       const zoneTitle = zones.find((zone) => zone.id === activeZone)?.label.toLocaleLowerCase('nl-NL').replace(/(^|\s)\S/g, (letter) => letter.toUpperCase())
       title = `${zoneTitle ?? 'Stilte & Draad'} · Stilte & Draad`
       if (activeZone in editorialZones) image = new URL(editorialZones[activeZone as keyof typeof editorialZones].heroImage, siteUrl).href
@@ -94,6 +109,8 @@ function AppContent() {
     setMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description })
     setMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: image })
     setMeta('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: `${title} — beeld van Stilte & Draad` })
+    if (notFound) setMeta('meta[name="robots"]', { name: 'robots', content: 'noindex, nofollow' })
+    else document.head.querySelector('meta[name="robots"]')?.remove()
 
     document.getElementById('product-structured-data')?.remove()
     if (routeType === 'werk' && slug) {
@@ -111,6 +128,14 @@ function AppContent() {
           sku: `SD-${String(product.id).padStart(4, '0')}`,
           brand: { '@type': 'Brand', name: 'Stilte & Draad' },
           manufacturer: { '@type': 'Person', name: 'Jannie van Zanten' },
+          offers: {
+            '@type': 'Offer',
+            priceCurrency: 'EUR',
+            price: product.price.toFixed(2),
+            availability: product.readiness === 'purchasable' && product.status === 'beschikbaar' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            seller: { '@id': `${siteUrl}/#organisatie` },
+            url: `${siteUrl}/werk/${product.slug}`,
+          },
         })
         document.head.appendChild(structuredData)
       }
@@ -162,6 +187,7 @@ function AppContent() {
   }, [activeZone, path])
 
   const renderRoute = () => {
+    if (!knownPath(path)) return <NotFoundPage navigate={navigate} />
     if (path === '/privacy') return <LegalPage type="privacy" />
     if (path === '/algemene-voorwaarden') return <LegalPage type="terms" />
     if (path === '/herroepen') return <WithdrawalPage />

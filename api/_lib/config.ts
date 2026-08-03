@@ -59,18 +59,6 @@ export const configurationState = () => {
   const reservationMinutes = positiveInteger('RESERVATION_DURATION_MINUTES', 15)
   if (!reservationMinutes || reservationMinutes < 5 || reservationMinutes > 60) issues.push('RESERVATION_DURATION_MINUTES moet tussen 5 en 60 liggen')
 
-  let shippingRates: Record<string, number> = {}
-  const rawShipping = value('SHIPPING_RATES_JSON')
-  if (rawShipping) {
-    try {
-      shippingRates = JSON.parse(rawShipping) as Record<string, number>
-      if (Object.values(shippingRates).some((rate) => !Number.isInteger(rate) || rate < 0)) throw new Error()
-    } catch {
-      issues.push('SHIPPING_RATES_JSON bevat geen geldige tarieven in centen')
-      shippingRates = {}
-    }
-  }
-
   return {
     ready: issues.length === 0,
     issues,
@@ -81,7 +69,6 @@ export const configurationState = () => {
     baseUrl: base?.origin ?? '',
     webhookUrl,
     reservationMinutes: reservationMinutes ?? 15,
-    shippingRates,
     production,
   }
 }

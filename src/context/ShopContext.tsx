@@ -3,9 +3,12 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 type ShopContextValue = {
   cart: number[]
   favorites: number[]
+  cartOpen: boolean
   toggleCart: (id: number) => void
   toggleFavorite: (id: number) => void
   clearCart: () => void
+  openCart: () => void
+  closeCart: () => void
 }
 
 const ShopContext = createContext<ShopContextValue | null>(null)
@@ -16,12 +19,15 @@ const readIds = (key: string) => {
 export const ShopProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<number[]>(() => readIds('stilte-draad-cart'))
   const [favorites, setFavorites] = useState<number[]>(() => readIds('stilte-draad-favorites'))
+  const [cartOpen, setCartOpen] = useState(false)
   useEffect(() => localStorage.setItem('stilte-draad-cart', JSON.stringify(cart)), [cart])
   useEffect(() => localStorage.setItem('stilte-draad-favorites', JSON.stringify(favorites)), [favorites])
   const toggleCart = useCallback((id: number) => setCart((items) => items.includes(id) ? items.filter((item) => item !== id) : [...items, id]), [])
   const toggleFavorite = useCallback((id: number) => setFavorites((items) => items.includes(id) ? items.filter((item) => item !== id) : [...items, id]), [])
   const clearCart = useCallback(() => setCart((items) => items.length ? [] : items), [])
-  const value = useMemo(() => ({ cart, favorites, toggleCart, toggleFavorite, clearCart }), [cart, clearCart, favorites, toggleCart, toggleFavorite])
+  const openCart = useCallback(() => setCartOpen(true), [])
+  const closeCart = useCallback(() => setCartOpen(false), [])
+  const value = useMemo(() => ({ cart, favorites, cartOpen, toggleCart, toggleFavorite, clearCart, openCart, closeCart }), [cart, cartOpen, clearCart, closeCart, favorites, openCart, toggleCart, toggleFavorite])
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>
 }
 

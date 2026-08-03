@@ -16,6 +16,7 @@ import PaymentStatusPage from './pages/PaymentStatusPage'
 import ContactPage from './pages/ContactPage'
 import { siteDetails } from './data/siteDetails'
 import WithdrawalPage from './pages/WithdrawalPage'
+import GlobalCart from './components/GlobalCart'
 
 const zoneIds = new Set(zones.map((zone) => zone.id))
 const pathForZone = (zone: ZoneId) => zone === 'de-eerste-draad' ? '/' : `/${zone}`
@@ -184,9 +185,12 @@ function AppContent() {
         <div className="min-w-0 flex flex-1 flex-col gap-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
             <button type="button" onClick={() => navigate('/')} className="space-y-1 self-start text-left text-sm uppercase tracking-[0.24em] text-neutral-700"><span className="block font-semibold text-neutral-800">STILTE &amp; DRAAD</span><span className="block text-xs font-normal text-neutral-600">door Jannie</span></button>
-            <div className="flex items-center gap-2.5 rounded-full border border-white/70 bg-white/65 px-3.5 py-2.5 text-neutral-600 backdrop-blur-sm" role="note" aria-label="Zet je geluid aan voor de beste ervaring">
-              <span aria-hidden="true" className="flex h-7 w-7 items-center justify-center rounded-full border border-neutral-800/15 bg-white/45 text-sm">♫</span>
-              <span className="text-[9px] uppercase tracking-[0.13em]">Zet je geluid aan voor de beste ervaring</span>
+            <div className="flex flex-wrap items-center gap-2.5 sm:justify-end">
+              <div className="flex items-center gap-2.5 rounded-full border border-white/70 bg-white/65 px-3.5 py-2.5 text-neutral-600 backdrop-blur-sm" role="note" aria-label="Zet je geluid aan voor de beste ervaring">
+                <span aria-hidden="true" className="flex h-7 w-7 items-center justify-center rounded-full border border-neutral-800/15 bg-white/45 text-sm">♫</span>
+                <span className="hidden text-[9px] uppercase tracking-[0.13em] min-[460px]:inline">Zet je geluid aan voor de beste ervaring</span>
+              </div>
+              <GlobalCart navigate={navigate} />
             </div>
           </div>
           <main id="inhoud" tabIndex={-1}>{renderRoute()}</main>

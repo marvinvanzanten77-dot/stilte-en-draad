@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { productCategories as categories, productThumbnail, products } from '../data/products'
 import { useShop } from '../context/ShopContext'
 import { useProductAvailability } from '../hooks/useProductAvailability'
@@ -6,39 +6,11 @@ import { formatCents } from '../utils/money'
 
 const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
   const [activeCategory, setActiveCategory] = useState<(typeof categories)[number]>('Alles')
-  const [cartOpen, setCartOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<'verhaal' | 'laag' | 'hoog' | 'beschikbaar' | 'verkocht'>('verhaal')
   const [favoritesOnly, setFavoritesOnly] = useState(false)
-  const cartDialogRef = useRef<HTMLElement>(null)
-  const cartButtonRef = useRef<HTMLButtonElement>(null)
-  const { cart, favorites, toggleCart, toggleFavorite, clearCart } = useShop()
+  const { cart, favorites, openCart, toggleCart, toggleFavorite } = useShop()
   const availability = useProductAvailability(products.map((product) => product.id))
-
-  useEffect(() => {
-    if (!cartOpen) return
-    const previousFocus = document.activeElement as HTMLElement | null
-    const cartButton = cartButtonRef.current
-    cartDialogRef.current?.querySelector<HTMLElement>('button')?.focus()
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setCartOpen(false)
-        return
-      }
-      if (event.key !== 'Tab' || !cartDialogRef.current) return
-      const focusable = [...cartDialogRef.current.querySelectorAll<HTMLElement>('button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled)')]
-      if (focusable.length === 0) return
-      const first = focusable[0]
-      const last = focusable.at(-1)!
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
-    }
-    document.addEventListener('keydown', onKeyDown)
-    return () => {
-      document.removeEventListener('keydown', onKeyDown)
-      ;(previousFocus ?? cartButton)?.focus()
-    }
-  }, [cartOpen])
 
   const visibleProducts = useMemo(
     () => products
@@ -59,9 +31,6 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
     [activeCategory, availability, favorites, favoritesOnly, query, sort],
   )
 
-  const cartProducts = cart.map((id) => products.find((product) => product.id === id)).filter((product) => product !== undefined)
-  const cartTotalCents = cartProducts.reduce((total, product) => total + product.price * 100, 0)
-
   return (
     <div className="min-h-[560px] overflow-hidden rounded-2xl bg-[#e7ddc9] shadow-soft ring-1 ring-neutral-200/40">
       <header className="flex flex-col gap-6 border-b border-neutral-800/10 p-7 md:flex-row md:items-end md:justify-between md:p-10">
@@ -72,49 +41,7 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
             Ieder werk draagt een herinnering, een droom of een stukje leven en wacht op een plek om verder te leven.
           </p>
         </div>
-        <button
-          ref={cartButtonRef}
-          type="button"
-          onClick={() => setCartOpen((open) => !open)}
-          aria-expanded={cartOpen}
-          className="flex items-center justify-between gap-5 self-start rounded-full border border-neutral-800/20 bg-white/35 px-5 py-3 text-xs uppercase tracking-[0.16em] transition hover:bg-white/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-700"
-        >
-          Winkelmand
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-900 text-[10px] text-white">{cart.length}</span>
-        </button>
       </header>
-
-      {cartOpen && (
-        <aside ref={cartDialogRef} className="border-b border-neutral-800/10 bg-white/25 px-7 py-6 md:px-10" role="dialog" aria-modal="true" aria-labelledby="cart-title">
-          <div className="flex items-center justify-between">
-            <p id="cart-title" className="text-xs font-semibold uppercase tracking-[0.16em]">Jouw gekozen werken</p>
-            <div className="flex items-center gap-3">{cart.length > 0 && <button type="button" onClick={clearCart} className="text-[10px] uppercase tracking-[0.14em] text-neutral-500 underline underline-offset-4">Maak leeg</button>}<button type="button" onClick={() => setCartOpen(false)} aria-label="Sluit winkelmand" className="flex h-8 w-8 items-center justify-center rounded-full border border-neutral-800/15 text-lg">×</button></div>
-          </div>
-          {cart.length === 0 ? (
-            <p className="mt-2 text-sm text-neutral-600">Je winkelmand is nog leeg.</p>
-          ) : (
-            <div className="mt-4 space-y-3">
-              {cartProducts.map((product) => (
-                <div key={product.id} className="flex items-center gap-4 rounded-lg bg-white/30 p-2">
-                  <img src={productThumbnail(product)} alt="" className="h-14 w-14 rounded-md object-cover" />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{product.title}</p>
-                    <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-500">{formatCents(product.price * 100)}</p>
-                  </div>
-                  <button type="button" onClick={() => toggleCart(product.id)} aria-label={`Verwijder ${product.title}`} className="h-8 w-8 rounded-full text-neutral-500 hover:bg-white/50">×</button>
-                </div>
-              ))}
-              <div className="flex items-center justify-between border-t border-neutral-800/10 pt-4 text-sm">
-                <span className="uppercase tracking-[0.14em] text-neutral-500">Totaal</span>
-                <strong>{formatCents(cartTotalCents)}</strong>
-              </div>
-              <p className="text-xs leading-5 text-neutral-600">Afhalen op afspraak in IJzendoorn, doorgaans binnen twee tot vijf werkdagen. Verzending is nog niet beschikbaar.</p>
-              <button type="button" onClick={() => { setCartOpen(false); navigate('/checkout') }} className="w-full rounded-full bg-neutral-900 px-5 py-3.5 text-xs uppercase tracking-[0.16em] text-white">Naar veilig afrekenen</button>
-              <p className="mt-2 rounded-full border border-neutral-800/15 px-5 py-3 text-center text-xs uppercase tracking-[0.16em] text-neutral-600">Je selectie wordt op dit apparaat bewaard</p>
-            </div>
-          )}
-        </aside>
-      )}
 
       <div className="p-7 md:p-10">
         <div className="flex flex-wrap gap-2" aria-label="Productcategorieën">
@@ -160,8 +87,8 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
                 </button>
                 <div className="flex items-center justify-between border-t border-neutral-800/10 px-5 py-4">
                   <span className="text-sm font-medium tracking-[0.06em] text-neutral-700">{formatCents(product.price * 100)}</span>
-                  <div className="flex gap-2"><button type="button" onClick={() => toggleFavorite(product.id)} aria-label={`${favorites.includes(product.id) ? 'Verwijder' : 'Voeg toe'} favoriet ${product.title}`} className="h-8 w-8 rounded-full border border-neutral-800/15">{favorites.includes(product.id) ? '♥' : '♡'}</button><button type="button" disabled={sold || !readyToBuy || (productStatus !== 'available' && !inCart)} onClick={() => toggleCart(product.id)} className={`rounded-full px-3 py-2 text-[10px] uppercase tracking-[0.13em] transition disabled:cursor-not-allowed disabled:opacity-45 ${inCart ? 'bg-neutral-900 text-white' : 'border border-neutral-800/20 hover:bg-white/50'}`}>
-                    {sold ? 'Verkocht' : inCart ? 'Gekozen ✓' : !readyToBuy ? 'Binnenkort' : productStatus === 'reserved' ? 'Gereserveerd' : 'Bewaar werk'}
+                  <div className="flex gap-2"><button type="button" onClick={() => toggleFavorite(product.id)} aria-label={`${favorites.includes(product.id) ? 'Verwijder' : 'Voeg toe'} favoriet ${product.title}`} className="h-8 w-8 rounded-full border border-neutral-800/15">{favorites.includes(product.id) ? '♥' : '♡'}</button><button type="button" disabled={sold || !readyToBuy || (productStatus !== 'available' && !inCart)} onClick={() => { toggleCart(product.id); if (!inCart) openCart() }} className={`rounded-full px-3 py-2 text-[10px] uppercase tracking-[0.13em] transition disabled:cursor-not-allowed disabled:opacity-45 ${inCart ? 'bg-neutral-900 text-white' : 'border border-neutral-800/20 hover:bg-white/50'}`}>
+                    {sold ? 'Verkocht' : inCart ? 'Uit winkelmand' : !readyToBuy ? 'Binnenkort' : productStatus === 'reserved' ? 'Gereserveerd' : 'In winkelmand'}
                   </button></div>
                 </div>
               </article>

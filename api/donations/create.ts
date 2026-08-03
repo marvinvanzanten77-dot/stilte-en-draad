@@ -6,6 +6,7 @@ import { createMolliePayment } from '../_lib/mollie.js'
 import { newOrderIdentity } from '../_lib/orders.js'
 import { attachPayment, canResumePaymentCreation, createDonation, findByIdempotencyKey, getOrder } from '../_lib/store.js'
 import type { StoredOrder } from '../_lib/store.js'
+import { formatCents } from '../../src/utils/money.js'
 
 export const donationSchema = z.object({
   amountCents: z.number().int().positive(),
@@ -84,7 +85,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
     } catch (error) {
       const message = error instanceof Error ? error.message : ''
       if (message.startsWith('DONATION_MIN:')) {
-      return json(response, 400, { error: `Het minimumbedrag is € ${(config.minimumDonationCents / 100).toFixed(2).replace('.', ',')}.` })
+      return json(response, 400, { error: `Het minimumbedrag is ${formatCents(config.minimumDonationCents)}.` })
       }
       if (message.startsWith('DONATION_TECHNICAL_MAX:')) {
         return json(response, 400, { error: 'Dit bedrag kon door onze technische veiligheidscontrole niet worden verwerkt. Neem contact op als je dit bedrag bewust wilt bijdragen.' })

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { formatPrice, productCategories as categories, productThumbnail, products } from '../data/products'
+import { productCategories as categories, productThumbnail, products } from '../data/products'
 import { useShop } from '../context/ShopContext'
 import { useProductAvailability } from '../hooks/useProductAvailability'
+import { formatCents } from '../utils/money'
 
 const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
   const [activeCategory, setActiveCategory] = useState<(typeof categories)[number]>('Alles')
@@ -59,7 +60,7 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
   )
 
   const cartProducts = cart.map((id) => products.find((product) => product.id === id)).filter((product) => product !== undefined)
-  const cartTotal = cartProducts.reduce((total, product) => total + product.price, 0)
+  const cartTotalCents = cartProducts.reduce((total, product) => total + product.price * 100, 0)
 
   return (
     <div className="min-h-[560px] overflow-hidden rounded-2xl bg-[#e7ddc9] shadow-soft ring-1 ring-neutral-200/40">
@@ -98,14 +99,14 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
                   <img src={productThumbnail(product)} alt="" className="h-14 w-14 rounded-md object-cover" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{product.title}</p>
-                    <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-500">{formatPrice(product.price)}</p>
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-500">{formatCents(product.price * 100)}</p>
                   </div>
                   <button type="button" onClick={() => toggleCart(product.id)} aria-label={`Verwijder ${product.title}`} className="h-8 w-8 rounded-full text-neutral-500 hover:bg-white/50">×</button>
                 </div>
               ))}
               <div className="flex items-center justify-between border-t border-neutral-800/10 pt-4 text-sm">
                 <span className="uppercase tracking-[0.14em] text-neutral-500">Totaal</span>
-                <strong>{formatPrice(cartTotal)}</strong>
+                <strong>{formatCents(cartTotalCents)}</strong>
               </div>
               <button type="button" onClick={() => { setCartOpen(false); navigate('/checkout') }} className="w-full rounded-full bg-neutral-900 px-5 py-3.5 text-xs uppercase tracking-[0.16em] text-white">Naar veilig afrekenen</button>
               <p className="mt-2 rounded-full border border-neutral-800/15 px-5 py-3 text-center text-xs uppercase tracking-[0.16em] text-neutral-600">Je selectie wordt op dit apparaat bewaard</p>
@@ -157,7 +158,7 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
                   </div>
                 </button>
                 <div className="flex items-center justify-between border-t border-neutral-800/10 px-5 py-4">
-                  <span className="text-sm font-medium tracking-[0.06em] text-neutral-700">{formatPrice(product.price)}</span>
+                  <span className="text-sm font-medium tracking-[0.06em] text-neutral-700">{formatCents(product.price * 100)}</span>
                   <div className="flex gap-2"><button type="button" onClick={() => toggleFavorite(product.id)} aria-label={`${favorites.includes(product.id) ? 'Verwijder' : 'Voeg toe'} favoriet ${product.title}`} className="h-8 w-8 rounded-full border border-neutral-800/15">{favorites.includes(product.id) ? '♥' : '♡'}</button><button type="button" disabled={sold || !readyToBuy || (productStatus !== 'available' && !inCart)} onClick={() => toggleCart(product.id)} className={`rounded-full px-3 py-2 text-[10px] uppercase tracking-[0.13em] transition disabled:cursor-not-allowed disabled:opacity-45 ${inCart ? 'bg-neutral-900 text-white' : 'border border-neutral-800/20 hover:bg-white/50'}`}>
                     {sold ? 'Verkocht' : inCart ? 'Gekozen ✓' : !readyToBuy ? 'Binnenkort' : productStatus === 'reserved' ? 'Gereserveerd' : 'Bewaar werk'}
                   </button></div>

@@ -1,14 +1,15 @@
 import { useMemo, useRef, useState, type FormEvent } from 'react'
 import { useShop } from '../context/ShopContext'
-import { formatPrice, productThumbnail, products } from '../data/products'
+import { productThumbnail, products } from '../data/products'
 import { usePaymentAvailability } from '../hooks/usePaymentAvailability'
+import { formatCents } from '../utils/money'
 
 type PaymentResponse = { orderId: string; orderNumber: string; checkoutUrl: string; qrCodeUrl?: string }
 
 const CheckoutPage = ({ navigate }: { navigate: (path: string) => void }) => {
   const { cart, toggleCart } = useShop()
   const selected = useMemo(() => cart.map((id) => products.find((product) => product.id === id)).filter(Boolean), [cart])
-  const subtotal = selected.reduce((sum, product) => sum + product!.price, 0)
+  const subtotalCents = selected.reduce((sum, product) => sum + product!.price * 100, 0)
   const orderReady = selected.every((product) => product?.readiness === 'purchasable')
   const pickupReady = orderReady && selected.every((product) => product?.pickupAllowed)
   const shippingReady = orderReady && selected.every((product) => product?.shippingAllowed && product.shippingClass)
@@ -106,8 +107,8 @@ const CheckoutPage = ({ navigate }: { navigate: (path: string) => void }) => {
           </div>
           <aside className="border-t border-neutral-800/10 bg-white/20 p-7 lg:border-l lg:border-t-0">
             <h2 className="text-xs font-semibold uppercase tracking-[0.15em]">Overzicht</h2>
-            <div className="mt-5 space-y-4">{selected.map((product) => <div key={product!.id} className="flex gap-3"><img src={productThumbnail(product!)} alt="" className="h-16 w-16 rounded-lg object-cover" /><div className="min-w-0 flex-1"><p className="text-sm font-medium">{product!.title}</p><p className="mt-1 text-xs text-neutral-500">{formatPrice(product!.price)} · één uniek exemplaar</p></div><button type="button" onClick={() => toggleCart(product!.id)} aria-label={`Verwijder ${product!.title}`} className="self-start text-lg">×</button></div>)}</div>
-            <dl className="mt-6 space-y-3 border-t border-neutral-800/10 pt-5 text-sm"><div className="flex justify-between"><dt>Subtotaal</dt><dd>{formatPrice(subtotal)}</dd></div><div className="flex justify-between"><dt>{fulfillment === 'pickup' ? 'Ophalen' : 'Verzending'}</dt><dd>{fulfillment === 'pickup' ? '€ 0' : 'Nog te bepalen'}</dd></div><div className="flex justify-between border-t border-neutral-800/10 pt-3 font-semibold"><dt>Totaal</dt><dd>{formatPrice(subtotal)}</dd></div></dl>
+            <div className="mt-5 space-y-4">{selected.map((product) => <div key={product!.id} className="flex gap-3"><img src={productThumbnail(product!)} alt="" className="h-16 w-16 rounded-lg object-cover" /><div className="min-w-0 flex-1"><p className="text-sm font-medium">{product!.title}</p><p className="mt-1 text-xs text-neutral-500">{formatCents(product!.price * 100)} · één uniek exemplaar</p></div><button type="button" onClick={() => toggleCart(product!.id)} aria-label={`Verwijder ${product!.title}`} className="self-start text-lg">×</button></div>)}</div>
+            <dl className="mt-6 space-y-3 border-t border-neutral-800/10 pt-5 text-sm"><div className="flex justify-between"><dt>Subtotaal</dt><dd>{formatCents(subtotalCents)}</dd></div><div className="flex justify-between"><dt>{fulfillment === 'pickup' ? 'Ophalen' : 'Verzending'}</dt><dd>{fulfillment === 'pickup' ? formatCents(0) : 'Nog te bepalen'}</dd></div><div className="flex justify-between border-t border-neutral-800/10 pt-3 font-semibold"><dt>Totaal</dt><dd>{formatCents(subtotalCents)}</dd></div></dl>
             <div className="mt-6 rounded-xl border border-neutral-800/10 bg-white/30 p-4"><p className="text-[9px] uppercase tracking-[0.15em] text-neutral-500">Betaalmethode</p><p className="mt-2 text-sm font-medium">iDEAL · via Mollie</p></div>
             {error && <p role="alert" className="mt-5 rounded-xl border border-red-900/20 bg-red-50/45 p-4 text-sm text-red-900">{error}</p>}
             {!availability.loading && !availability.available && <div role="status" className="mt-5 rounded-xl border border-[#9b7d4f]/20 bg-white/30 p-4 text-sm leading-6 text-neutral-600"><p>{availability.message}</p>{availability.configuration && <details className="mt-3 text-xs"><summary className="cursor-pointer">Configuratie voor ontwikkeling</summary><ul className="mt-2 list-disc space-y-1 pl-5">{availability.configuration.map((item) => <li key={item}>{item}</li>)}</ul></details>}</div>}

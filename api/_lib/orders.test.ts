@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { configurationState, donationConfigurationState } from './config.js'
 import { mapStatus, synchronizePaymentWith } from './mollie.js'
-import { catalogItem, SHIPPING_COST_CENTS, shippingFor, trustedItems, validateDonationAmount } from './orders.js'
+import { catalogItem, SHIPPING_COST_CENTS, shippingFor, trustedItems } from './orders.js'
 import { hasInventoryConflict, keepTerminalStatus, type StoredOrder } from './store.js'
 import { checkoutSchema, processCheckout, type CheckoutDependencies } from '../checkout/create.js'
 import { donationSchema, processDonation, type DonationDependencies } from '../donations/create.js'
@@ -68,13 +68,6 @@ describe('invoervalidatie', () => {
     })).toThrow()
   })
 
-  it('weigert ongeldige donaties', () => {
-    expect(validateDonationAmount(0, 100, 100_000)).toBe(false)
-    expect(validateDonationAmount(-100, 100, 100_000)).toBe(false)
-    expect(validateDonationAmount(100_001, 100, 100_000)).toBe(false)
-    expect(validateDonationAmount(500, 100, 100_000)).toBe(true)
-  })
-
   it('vereist e-mail en identiteit of anoniem bij donaties', () => {
     expect(() => donationSchema.parse({ amountCents: 500, name: '', email: '', anonymous: false, idempotencyKey: crypto.randomUUID() })).toThrow()
     expect(donationSchema.parse({ amountCents: 500, name: '', email: 'gever@example.nl', anonymous: true, idempotencyKey: crypto.randomUUID() }).anonymous).toBe(true)
@@ -107,12 +100,12 @@ describe('strikte configuratiescheiding', () => {
     expect(configurationState().issues).toContain('Een live-key mag niet buiten Vercel Production worden gebruikt')
   })
 
-  it('vereist aparte donatiegrenzen', () => {
+  it('vereist alleen een bevestigingsdrempel en geen donatiegrenzen', () => {
     process.env = {
       PAYMENTS_ENABLED: 'true', DATABASE_URL: 'postgres://example', MOLLIE_API_KEY: 'test_example',
       MOLLIE_MODE: 'test', APP_BASE_URL: 'http://localhost:3000', MOLLIE_WEBHOOK_URL: 'https://example.nl/api/mollie/webhook',
     }
-    expect(donationConfigurationState().issues).toContain('DONATION_MIN_AMOUNT ontbreekt of is ongeldig')
+    expect(donationConfigurationState().issues).toContain('DONATION_CONFIRM_THRESHOLD ontbreekt of is ongeldig')
   })
 })
 
@@ -291,15 +284,15 @@ describe('volledige donatieorkestratie met mocks', () => {
 
   it('maakt een anonieme donatie zonder voorraadreservering', async () => {
     const { deps, createOrder, createPayment } = dependencies()
-    const result = await processDonation(input, { minimumDonationCents: 100, technicalMaximumDonationCents: 100_000, confirmationThresholdCents: 50_000 }, deps)
+    const result = await processDonation(input, { confirmationThresholdCents: 50_000 }, deps)
     expect(result.created).toBe(true)
     expect(createOrder).toHaveBeenCalledWith(expect.objectContaining({ anonymous: true, name: null, amountCents: 500 }))
     expect(createPayment).toHaveBeenCalledOnce()
   })
 
-  it('blokkeert bedragen buiten beide configureerbare grenzen', async () => {
-    const config = { minimumDonationCents: 100, technicalMaximumDonationCents: 100_000, confirmationThresholdCents: 50_000 }
-    await expect(processDonation({ ...input, amountCents: 99 }, config, dependencies().deps)).rejects.toThrow('DONATION_MIN')
-    await expect(processDonation({ ...input, amountCents: 100_001 }, config, dependencies().deps)).rejects.toThrow('DONATION_TECHNICAL_MAX')
+  it('accepteert ieder positief centbedrag zonder minimum of maximum', async () => {
+    const config = { confirmationThresholdCents: 50_000 }
+    await expect(processDonation({ ...input, amountCents: 1 }, config, dependencies().deps)).resolves.toMatchObject({ created: true })
+    await expect(processDonation({ ...input, amountCents: 100_000_001, confirmedAmountCents: 100_000_001 }, config, dependencies().deps)).resolves.toMatchObject({ created: true })
   })
 })

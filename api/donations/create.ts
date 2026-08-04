@@ -6,7 +6,6 @@ import { createMolliePayment } from '../_lib/mollie.js'
 import { newOrderIdentity } from '../_lib/orders.js'
 import { attachPayment, canResumePaymentCreation, createDonation, findByIdempotencyKey, getOrder } from '../_lib/store.js'
 import type { StoredOrder } from '../_lib/store.js'
-import { formatCents } from '../../src/utils/money.js'
 import { processPendingEmailsSafely } from '../_lib/email-dispatch.js'
 
 export const donationSchema = z.object({
@@ -23,7 +22,7 @@ export const donationSchema = z.object({
 })
 export type DonationInput = z.infer<typeof donationSchema>
 
-type DonationConfig = { minimumDonationCents: number; technicalMaximumDonationCents: number; confirmationThresholdCents: number }
+type DonationConfig = { confirmationThresholdCents: number }
 export type DonationDependencies = {
   findByKey: typeof findByIdempotencyKey
   canResume: typeof canResumePaymentCreation
@@ -39,12 +38,6 @@ const donationDependencies: DonationDependencies = {
 }
 
 export const processDonation = async (input: DonationInput, config: DonationConfig, dependencies: DonationDependencies = donationDependencies) => {
-  if (input.amountCents < config.minimumDonationCents) {
-    throw new Error(`DONATION_MIN:${config.minimumDonationCents}`)
-  }
-  if (input.amountCents > config.technicalMaximumDonationCents) {
-    throw new Error(`DONATION_TECHNICAL_MAX:${config.technicalMaximumDonationCents}`)
-  }
   if (input.amountCents >= config.confirmationThresholdCents && input.confirmedAmountCents !== input.amountCents) {
     throw new Error('DONATION_CONFIRMATION_REQUIRED')
   }
@@ -85,12 +78,6 @@ export default async function handler(request: VercelRequest, response: VercelRe
       result = await processDonation(input, config)
     } catch (error) {
       const message = error instanceof Error ? error.message : ''
-      if (message.startsWith('DONATION_MIN:')) {
-      return json(response, 400, { error: `Het minimumbedrag is ${formatCents(config.minimumDonationCents)}.` })
-      }
-      if (message.startsWith('DONATION_TECHNICAL_MAX:')) {
-        return json(response, 400, { error: 'Dit bedrag kon door onze technische veiligheidscontrole niet worden verwerkt. Neem contact op als je dit bedrag bewust wilt bijdragen.' })
-      }
       if (message === 'DONATION_CONFIRMATION_REQUIRED') {
         return json(response, 400, { error: 'Bevestig het exacte donatiebedrag voordat je verdergaat.' })
       }

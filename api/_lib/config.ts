@@ -81,29 +81,17 @@ export const serverConfig = () => {
 
 export const donationConfig = () => {
   const config = serverConfig()
-  const minimumDonationCents = decimalEuroEnvironmentToCents('DONATION_MIN_AMOUNT')
-  const technicalMaximumDonationCents = decimalEuroEnvironmentToCents('DONATION_TECHNICAL_MAX_AMOUNT')
   const confirmationThresholdCents = decimalEuroEnvironmentToCents('DONATION_CONFIRM_THRESHOLD')
   const issues: string[] = []
-  if (!minimumDonationCents) issues.push('DONATION_MIN_AMOUNT ontbreekt of is ongeldig')
-  if (!technicalMaximumDonationCents) issues.push('DONATION_TECHNICAL_MAX_AMOUNT ontbreekt of is ongeldig')
   if (!confirmationThresholdCents) issues.push('DONATION_CONFIRM_THRESHOLD ontbreekt of is ongeldig')
-  if (minimumDonationCents && technicalMaximumDonationCents && technicalMaximumDonationCents < minimumDonationCents) issues.push('DONATION_TECHNICAL_MAX_AMOUNT is lager dan het minimum')
-  if (confirmationThresholdCents && technicalMaximumDonationCents && confirmationThresholdCents > technicalMaximumDonationCents) issues.push('DONATION_CONFIRM_THRESHOLD ligt boven het technische veiligheidsplafond')
   if (issues.length) throw new ConfigurationError('Online doneren is tijdelijk nog niet beschikbaar.', issues)
-  return { ...config, minimumDonationCents: minimumDonationCents!, technicalMaximumDonationCents: technicalMaximumDonationCents!, confirmationThresholdCents: confirmationThresholdCents! }
+  return { ...config, confirmationThresholdCents: confirmationThresholdCents! }
 }
 
 export const donationConfigurationState = () => {
   const base = configurationState()
   const issues = [...base.issues]
-  const minimumDonationCents = decimalEuroEnvironmentToCents('DONATION_MIN_AMOUNT')
-  const technicalMaximumDonationCents = decimalEuroEnvironmentToCents('DONATION_TECHNICAL_MAX_AMOUNT')
   const confirmationThresholdCents = decimalEuroEnvironmentToCents('DONATION_CONFIRM_THRESHOLD')
-  if (!minimumDonationCents) issues.push('DONATION_MIN_AMOUNT ontbreekt of is ongeldig')
-  if (!technicalMaximumDonationCents) issues.push('DONATION_TECHNICAL_MAX_AMOUNT ontbreekt of is ongeldig')
   if (!confirmationThresholdCents) issues.push('DONATION_CONFIRM_THRESHOLD ontbreekt of is ongeldig')
-  if (minimumDonationCents && technicalMaximumDonationCents && technicalMaximumDonationCents < minimumDonationCents) issues.push('DONATION_TECHNICAL_MAX_AMOUNT is lager dan het minimum')
-  if (confirmationThresholdCents && technicalMaximumDonationCents && confirmationThresholdCents > technicalMaximumDonationCents) issues.push('DONATION_CONFIRM_THRESHOLD ligt boven het technische veiligheidsplafond')
-  return { ready: issues.length === 0, issues, minimumDonationCents, confirmationThresholdCents }
+  return { ready: issues.length === 0, issues, confirmationThresholdCents }
 }

@@ -10,11 +10,6 @@ export const newOrderIdentity = (prefix: 'SD' | 'DON') => {
 
 export const catalogItem = (productId: number) => products.find((candidate) => candidate.id === productId)
 
-export const validateDonationAmount = (amountCents: number, minimumCents: number, maximumCents: number) => {
-  if (!Number.isInteger(amountCents) || amountCents < minimumCents || amountCents > maximumCents) return false
-  return true
-}
-
 export const SHIPPING_COST_CENTS = 695
 
 export const trustedItems = (productIds: number[]) => {

@@ -80,8 +80,7 @@ Bij een zeer late `paid`-status wordt de voorraad opnieuw vergrendeld. Is het we
    - `APP_BASE_URL` van de publieke preview
    - `MOLLIE_WEBHOOK_URL=https://preview…/api/mollie/webhook`
    - `RESERVATION_DURATION_MINUTES=15`
-   - `DONATION_MIN_AMOUNT=2.50`
-   - `DONATION_TECHNICAL_MAX_AMOUNT=10000.00`
+   - Donaties hebben geen ingestelde commerciële minimum- of maximumgrens; uitsluitend positieve centbedragen zijn technisch geldig.
    - `DONATION_CONFIRM_THRESHOLD=500.00`
 7. Controleer dat base-URL en webhook exact dezelfde HTTPS-herkomst gebruiken.
 

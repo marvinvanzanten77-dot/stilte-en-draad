@@ -4,8 +4,6 @@ import { parseEuroAmountToCents } from '../../src/utils/money.js'
 import type { StoredOrder } from './store.js'
 
 const config = {
-  minimumDonationCents: 250,
-  technicalMaximumDonationCents: 1_000_000,
   confirmationThresholdCents: 50_000,
 }
 const base = {
@@ -37,27 +35,23 @@ describe('veilige euro-invoer', () => {
   })
 })
 
-describe('donatiegrenzen en expliciete bevestiging', () => {
-  it('weigert onder €2,50, nul en negatieve/gemanipuleerde schemawaarden', async () => {
-    await expect(processDonation({ ...base, amountCents: 249 }, config, dependencies())).rejects.toThrow('DONATION_MIN')
+describe('vrije donatiebedragen en expliciete bevestiging', () => {
+  it('accepteert één cent maar weigert nul en negatieve/gemanipuleerde schemawaarden', async () => {
+    await expect(processDonation({ ...base, amountCents: 1 }, config, dependencies())).resolves.toMatchObject({ created: true })
     expect(() => donationSchema.parse({ ...base, amountCents: 0 })).toThrow()
     expect(() => donationSchema.parse({ ...base, amountCents: -1 })).toThrow()
     expect(() => donationSchema.parse({ ...base, amountCents: 250.5 })).toThrow()
     expect(() => donationSchema.parse({ ...base, amountCents: '250' })).toThrow()
   })
 
-  it.each([250, 1_000, 49_999])('accepteert %i cent zonder extra bevestiging', async (amountCents) => {
+  it.each([1, 250, 1_000, 49_999])('accepteert %i cent zonder extra bevestiging', async (amountCents) => {
     await expect(processDonation({ ...base, amountCents }, config, dependencies())).resolves.toMatchObject({ created: true })
   })
 
-  it.each([50_000, 75_000, 1_000_000])('accepteert %i cent uitsluitend met een exacte bevestiging', async (amountCents) => {
+  it.each([50_000, 75_000, 1_000_000, 100_000_001])('accepteert %i cent uitsluitend met een exacte bevestiging', async (amountCents) => {
     await expect(processDonation({ ...base, amountCents }, config, dependencies())).rejects.toThrow('DONATION_CONFIRMATION_REQUIRED')
     await expect(processDonation({ ...base, amountCents, confirmedAmountCents: amountCents - 1 }, config, dependencies())).rejects.toThrow('DONATION_CONFIRMATION_REQUIRED')
     await expect(processDonation({ ...base, amountCents, confirmedAmountCents: amountCents }, config, dependencies())).resolves.toMatchObject({ created: true })
-  })
-
-  it('weigert boven het technische veiligheidsplafond', async () => {
-    await expect(processDonation({ ...base, amountCents: 1_000_001, confirmedAmountCents: 1_000_001 }, config, dependencies())).rejects.toThrow('DONATION_TECHNICAL_MAX')
   })
 
   it('hergebruikt bij dubbel submit dezelfde checkout en maakt geen betaling', async () => {

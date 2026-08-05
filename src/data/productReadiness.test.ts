@@ -13,8 +13,6 @@ describe('productgereedheid', () => {
     expect(products.find((product) => product.id === 11)?.readiness).toBe('display_only')
     expect(products.find((product) => product.id === 14)?.readiness).toBe('display_only')
     expect(products.find((product) => product.id === 23)?.readiness).toBe('display_only')
-    expect(products.find((product) => product.id === 26)?.readiness).toBe('display_only')
-    expect(products.find((product) => product.id === 27)?.readiness).toBe('display_only')
   })
 
   it('rapporteert ontbrekende velden exact per werk', () => {
@@ -34,8 +32,6 @@ describe('productgereedheid', () => {
     expect(incomplete).toEqual([
       { id: 11, missing: ['afmetingen (hoogte en breedte, of doorsnede)', 'diepte/dikte'] },
       { id: 23, missing: ['diepte/dikte'] },
-      { id: 26, missing: ['afmetingen (hoogte en breedte, of doorsnede)', 'diepte/dikte', 'materialen', 'onderhoud'] },
-      { id: 27, missing: ['afmetingen (hoogte en breedte, of doorsnede)', 'diepte/dikte', 'materialen', 'onderhoud'] },
     ])
   })
 })

@@ -90,6 +90,8 @@ const productUpdates: Record<number, Partial<Product>> = {
   23: { widthCm: 34, heightCm: 17, materials: ['polyester'], careInstructions: 'Niet te zwaar vullen om vorm en handwerk te behouden.' },
   24: { readiness: 'purchasable', diameterCm: 25, materials: ['katoen'], depthNotApplicable: true, careInstructions: 'Uitsluitend bestemd voor gebruik binnenshuis.' },
   25: { readiness: 'purchasable', diameterCm: 40, materials: ['katoen'], depthNotApplicable: true, careInstructions: 'Uitsluitend bestemd voor gebruik binnenshuis.' },
+  26: { readiness: 'purchasable', widthCm: 28, heightCm: 23, depthCm: 14, materials: ['polyester'], careInstructions: 'Niet te zwaar vullen om vorm en handwerk te behouden.' },
+  27: { readiness: 'purchasable', widthCm: 12, heightCm: 75, materials: ['ringen', 'katoen'], depthNotApplicable: true, careInstructions: 'Uitsluitend bestemd voor gebruik binnenshuis.' },
 }
 
 export const products: Product[] = entries.map<Product>((product) => ({

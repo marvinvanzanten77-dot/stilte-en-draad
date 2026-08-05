@@ -13,6 +13,8 @@ describe('productgereedheid', () => {
     expect(products.find((product) => product.id === 11)?.readiness).toBe('display_only')
     expect(products.find((product) => product.id === 14)?.readiness).toBe('display_only')
     expect(products.find((product) => product.id === 23)?.readiness).toBe('display_only')
+    expect(products.find((product) => product.id === 26)?.readiness).toBe('display_only')
+    expect(products.find((product) => product.id === 27)?.readiness).toBe('display_only')
   })
 
   it('rapporteert ontbrekende velden exact per werk', () => {
@@ -24,7 +26,7 @@ describe('productgereedheid', () => {
     expect(productReadinessIssues(products.find((product) => product.id === 1)!)).toEqual([])
   })
 
-  it('houdt de twee tassen met ontbrekende maten inhoudelijk onvolledig', () => {
+  it('houdt werken met ontbrekende verkoopgegevens inhoudelijk onvolledig', () => {
     const incomplete = products
       .filter((product) => product.status !== 'verkocht')
       .map((product) => ({ id: product.id, missing: productReadinessIssues(product) }))
@@ -32,6 +34,8 @@ describe('productgereedheid', () => {
     expect(incomplete).toEqual([
       { id: 11, missing: ['afmetingen (hoogte en breedte, of doorsnede)', 'diepte/dikte'] },
       { id: 23, missing: ['diepte/dikte'] },
+      { id: 26, missing: ['afmetingen (hoogte en breedte, of doorsnede)', 'diepte/dikte', 'materialen', 'onderhoud'] },
+      { id: 27, missing: ['afmetingen (hoogte en breedte, of doorsnede)', 'diepte/dikte', 'materialen', 'onderhoud'] },
     ])
   })
 })

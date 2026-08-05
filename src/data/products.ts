@@ -59,6 +59,8 @@ const entries: ProductEntry[] = [
   { id: 23, title: 'Nachtlijn', category: 'Tassen', description: 'Een donkere handgemaakte tas met een rustige vorm, stevig genoeg voor onderweg en zacht genoeg om dichtbij te dragen.', price: 49 },
   { id: 24, title: 'Roze Ochtend', category: 'Wandwerken', description: 'Roze draden, houten kralen en zachte kwasten komen samen in een werk over lichtheid en opnieuw beginnen.', price: 25 },
   { id: 25, title: 'Stille Zon', category: 'Wandwerken', description: 'Een open cirkel in warme zandtinten, met lange draden die het licht vangen en de ruimte zacht laten ademen.', price: 49 },
+  { id: 26, title: 'Zachte Reis', category: 'Tassen', description: 'Een handgemaakte tas in rustige zandtinten, waarin iedere steek iets van warmte en onderweg zijn meedraagt.', price: 49 },
+  { id: 27, title: 'Lichtspoor', category: 'Objecten', description: 'Vier kleine ringen volgen elkaar in het licht, verbonden als momenten die samen één stille lijn vormen.', price: 12.5 },
 ]
 
 const slugify = (title: string) => title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')

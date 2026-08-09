@@ -13,7 +13,9 @@
       ]
     }
   ],
+  "trailingSlash": false,
+  "cleanUrls": true,
   "rewrites": [
-    { "source": "/((?!api/|@vite/|@react-refresh$|src/|node_modules/|.*\\.).*)", "destination": "/index.html" }
+    { "source": "/betaling/:orderId", "destination": "/betaling.html" }
   ]
 }

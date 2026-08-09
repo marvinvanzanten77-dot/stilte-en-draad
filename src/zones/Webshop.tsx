@@ -37,11 +37,12 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
       <header className="flex flex-col gap-6 border-b border-neutral-800/10 p-7 md:flex-row md:items-end md:justify-between md:p-10">
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-neutral-600">Het atelier</p>
-          <h1 className="mt-2 text-2xl font-semibold uppercase tracking-[0.18em] text-neutral-900">Webshop</h1>
+          <h1 className="mt-2 text-2xl font-semibold uppercase tracking-[0.18em] text-neutral-900">Webshop · handgemaakte textielkunst</h1>
           <p className="mt-3 max-w-lg text-sm leading-6 text-neutral-700">
             Ieder werk draagt een herinnering, een droom of een stukje leven en wacht op een plek om verder te leven.
           </p>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-neutral-700">{companionStoryLong}</p>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-neutral-700">Ontdek unieke haakwerken, gehaakte wanddecoratie, dromenvangers en handgemaakte tassen uit Jannies atelier in IJzendoorn.</p>
         </div>
       </header>
 

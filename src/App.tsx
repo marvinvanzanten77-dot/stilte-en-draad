@@ -18,6 +18,7 @@ import { siteDetails } from './data/siteDetails'
 import WithdrawalPage from './pages/WithdrawalPage'
 import GlobalCart from './components/GlobalCart'
 import NotFoundPage from './pages/NotFoundPage'
+import { seoForPath } from './data/seo'
 
 const zoneIds = new Set(zones.map((zone) => zone.id))
 const pathForZone = (zone: ZoneId) => zone === 'de-eerste-draad' ? '/' : `/${zone}`
@@ -56,6 +57,7 @@ function AppContent() {
     const [, routeType, slug] = path.split('/')
     const standaloneRoute = standalonePaths.has(path) || path.startsWith('/betaling/')
     const notFound = !knownPath(path)
+    const routeSeo = seoForPath(path)
     if (notFound) {
       title = 'Pagina niet gevonden · Stilte & Draad'
       description = 'Deze pagina bestaat niet. Keer terug naar het begin van Stilte & Draad.'
@@ -87,9 +89,15 @@ function AppContent() {
       else if (activeZone === 'evenementen') image = `${siteUrl}/photos/rijdende-atelier-concept.jpg`
       else if (activeZone === 'de-laatste-draad') image = `${siteUrl}/photos/de-laatste-draad.jpg?v=optimized-20260801`
     }
+    if (!notFound && routeSeo) {
+      title = routeSeo.title
+      description = routeSeo.description
+      image = routeSeo.image
+    }
 
     document.title = title
-    const canonicalUrl = `${siteUrl}${path === '/' ? '' : path}`
+    const canonicalPath = routeSeo?.path === '/betaling' ? '/betaling' : path
+    const canonicalUrl = `${siteUrl}${canonicalPath === '/' ? '/' : canonicalPath}`
     let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
     if (!canonical) {
       canonical = document.createElement('link')
@@ -109,11 +117,21 @@ function AppContent() {
     setMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description })
     setMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: image })
     setMeta('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: `${title} — beeld van Stilte & Draad` })
-    if (notFound) setMeta('meta[name="robots"]', { name: 'robots', content: 'noindex, nofollow' })
-    else document.head.querySelector('meta[name="robots"]')?.remove()
+    if (notFound || routeSeo?.indexable === false) setMeta('meta[name="robots"]', { name: 'robots', content: 'noindex, nofollow' })
+    else setMeta('meta[name="robots"]', { name: 'robots', content: 'index, follow, max-image-preview:large' })
+
+    document.getElementById('prerender-structured-data')?.remove()
+    document.getElementById('route-structured-data')?.remove()
+    if (routeSeo?.structuredData) {
+      const routeStructuredData = document.createElement('script')
+      routeStructuredData.id = 'route-structured-data'
+      routeStructuredData.type = 'application/ld+json'
+      routeStructuredData.text = JSON.stringify(routeSeo.structuredData)
+      document.head.appendChild(routeStructuredData)
+    }
 
     document.getElementById('product-structured-data')?.remove()
-    if (routeType === 'werk' && slug) {
+    if (routeType === 'werk' && slug && !routeSeo?.structuredData) {
       const product = getProduct(slug)
       if (product) {
         const structuredData = document.createElement('script')

@@ -49,7 +49,9 @@ Dit bestand bevat uitsluitend werkzaamheden die nog niet aantoonbaar zijn afgero
 
 ## SEO en deelbaarheid
 
-- [ ] Google Search Console aansluiten, sitemap indienen en indexering controleren.
+- [x] Google Search Console-domainproperty voor `stilte-en-draad.nl` via DNS verifiëren en het verificatie-TXT-record permanent laten staan.
+- [x] `https://www.stilte-en-draad.nl/sitemap.xml` succesvol indienen; Google heeft 37 pagina’s ontdekt.
+- [ ] De daadwerkelijke indexering de komende dagen en weken blijven volgen in Pagina-indexering, Sitemaps en Uitgebreide resultaten.
 
 ## Toegankelijkheid
 

@@ -7,6 +7,7 @@ describe('productgereedheid', () => {
     expect(products.filter((product) => product.readiness === 'purchasable').every((product) => product.status === 'beschikbaar' && productReadinessIssues(product).length === 0 && product.duplicateOfProductId === null)).toBe(true)
     expect(products.filter((product) => product.status === 'verkocht').every((product) => product.readiness === 'sold')).toBe(true)
     expect(products.filter((product) => product.unique && product.readiness === 'purchasable').every((product) => product.stock === 1)).toBe(true)
+    expect(products.filter((product) => product.readiness === 'purchasable').every((product) => product.companionTextReady && product.companionTextType === 'eigen verhaal')).toBe(true)
   })
 
   it('blokkeert onvolledige en dubbele vermeldingen', () => {

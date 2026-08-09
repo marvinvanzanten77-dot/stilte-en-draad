@@ -30,6 +30,8 @@ export type Product = {
   shippingRegions: string[] | null
   shippingCostCents: number | null
   handmadeVariationNotice: string | null
+  companionTextType: 'eigen verhaal'
+  companionTextReady: boolean
   certificate: { prefix: string }
 }
 
@@ -120,6 +122,8 @@ export const products: Product[] = entries.map<Product>((product) => ({
   shippingRegions: ['NL'],
   shippingCostCents: 695,
   handmadeVariationNotice: 'Dit werk is met de hand gemaakt. Kleine onregelmatigheden horen bij het materiaal en maken ieder exemplaar eigen.',
+  companionTextType: 'eigen verhaal',
+  companionTextReady: true,
   certificate: { prefix: 'S&D' },
 })).map((product) => ({ ...product, ...(productUpdates[product.id] ?? {}) }))
 export const productCategories = ['Alles', 'Wandwerken', 'Tassen', 'Woontextiel', 'Objecten'] as const

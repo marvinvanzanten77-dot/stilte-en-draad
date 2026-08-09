@@ -3,6 +3,7 @@ import { productCategories as categories, productThumbnail, products } from '../
 import { useShop } from '../context/ShopContext'
 import { useProductAvailability } from '../hooks/useProductAvailability'
 import { formatCents } from '../utils/money'
+import { companionStoryLong } from '../data/companionStory'
 
 const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
   const [activeCategory, setActiveCategory] = useState<(typeof categories)[number]>('Alles')
@@ -40,6 +41,7 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
           <p className="mt-3 max-w-lg text-sm leading-6 text-neutral-700">
             Ieder werk draagt een herinnering, een droom of een stukje leven en wacht op een plek om verder te leven.
           </p>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-neutral-700">{companionStoryLong}</p>
         </div>
       </header>
 

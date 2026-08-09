@@ -3,6 +3,7 @@ import { useShop } from '../context/ShopContext'
 import { productThumbnail, products } from '../data/products'
 import { usePaymentAvailability } from '../hooks/usePaymentAvailability'
 import { formatCents } from '../utils/money'
+import { companionStoryLong } from '../data/companionStory'
 
 type PaymentResponse = { orderId: string; orderNumber: string; checkoutUrl: string; qrCodeUrl?: string }
 
@@ -84,6 +85,7 @@ const CheckoutPage = ({ navigate }: { navigate: (path: string) => void }) => {
         <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">Jouw gekozen werk</p>
         <h1 className="mt-3 text-2xl font-semibold uppercase tracking-[0.16em]">Veilig afrekenen</h1>
         <p className="mt-3 max-w-xl text-sm leading-7 text-neutral-600">Je ontvangt het door Jannie gemaakte exemplaar. De betaling wordt veilig verwerkt via Mollie.</p>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-neutral-600">{companionStoryLong}</p>
       </header>
       {selected.length === 0 ? <div className="p-10 text-center"><p>Je winkelmand is leeg.</p><button type="button" onClick={() => navigate('/webshop')} className="mt-5 rounded-full border border-neutral-800/20 px-5 py-3 text-xs uppercase tracking-[0.14em]">Terug naar de webshop</button></div> : !orderReady ? <div className="p-10 text-center"><p className="text-lg font-semibold uppercase tracking-[0.13em]">Dit werk wordt binnenkort bestelbaar</p><p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-neutral-600">Jannie controleert eerst de afmetingen, materialen en mogelijkheden voor ophalen of verzenden. Je gekozen werk blijft als favoriet en tentoonstellingsobject zichtbaar, maar kan nog niet worden afgerekend.</p><button type="button" onClick={() => navigate('/webshop')} className="mt-6 rounded-full border border-neutral-800/20 px-5 py-3 text-xs uppercase tracking-[0.14em]">Terug naar de webshop</button></div> : (
         <form onSubmit={submit} className="grid lg:grid-cols-[1fr_340px]">

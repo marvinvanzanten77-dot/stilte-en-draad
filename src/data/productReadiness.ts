@@ -14,6 +14,7 @@ export const productReadinessIssues = (product: Product): string[] => {
   if (!product.careInstructions?.trim()) issues.push('onderhoud')
   if (product.fragile === null) issues.push('kwetsbaarheid')
   if (!product.handmadeVariationNotice?.trim()) issues.push('handgemaakte afwijkingen')
+  if (!product.companionTextReady) issues.push('bijbehorende fysieke tekst')
   if (!product.pickupAllowed && !product.shippingAllowed) issues.push('afhalen of verzenden toegestaan')
   if (product.processingDays === null || product.processingDays < 0) issues.push('verwerkingstermijn')
   if (!product.deliveryTime?.trim()) issues.push('verwachte levertijd')

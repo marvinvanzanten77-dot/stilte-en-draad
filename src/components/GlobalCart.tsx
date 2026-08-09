@@ -3,6 +3,7 @@ import { useShop } from '../context/ShopContext'
 import { productThumbnail, products } from '../data/products'
 import { useDialogFocus } from '../hooks/useDialogFocus'
 import { formatCents } from '../utils/money'
+import { companionStoryShort } from '../data/companionStory'
 
 const GlobalCart = ({ navigate }: { navigate: (path: string) => void }) => {
   const { cart, cartOpen, clearCart, closeCart, openCart, toggleCart } = useShop()
@@ -50,6 +51,7 @@ const GlobalCart = ({ navigate }: { navigate: (path: string) => void }) => {
                     <p><strong className="font-medium text-neutral-800">Afhalen in IJzendoorn</strong> · gratis</p>
                     <p><strong className="font-medium text-neutral-800">Verzenden binnen Nederland</strong> · €6,95 per volledige bestelling</p>
                     <p>Je maakt de definitieve keuze tijdens het afrekenen.</p>
+                    <p>{companionStoryShort}</p>
                   </div>
                   <button type="button" onClick={goToCheckout} className="mt-5 w-full rounded-full bg-neutral-900 px-5 py-4 text-xs uppercase tracking-[0.16em] text-white">Naar veilig afrekenen</button>
                   <button type="button" onClick={clearCart} className="mt-4 w-full text-[10px] uppercase tracking-[0.14em] text-neutral-500 underline underline-offset-4">Maak winkelmand leeg</button>

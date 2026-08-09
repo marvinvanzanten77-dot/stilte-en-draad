@@ -5,6 +5,7 @@ export type EditorialZone = {
   coreLine: string
   introduction: string
   heroImage: string
+  heroImageSrcSet?: string
   heroImageWebp?: string
   heroAlt: string
   chapters: { number: string; title: string; prompt: string }[]
@@ -20,7 +21,7 @@ export type EditorialZone = {
 
 export const editorialZones: Record<'de-eerste-draad' | 'veld' | 'droom' | 'ritueel' | 'stilte', EditorialZone> = {
   'de-eerste-draad': {
-    eyebrow: 'De toegang', title: 'De Eerste Draad', question: 'Waarom zou ik binnenstappen?', coreLine: 'Alles begint met één draad.', introduction: 'Welkom in mijn wereld van stilte, kleur en draad. Hier groeit ieder werk langzaam vanuit een gevoel, een herinnering of een droom. De eerste draad weet nog niet waar hij eindigt — en juist daarin begint het verhaal.', heroImage: '/photos/jannie-hakend-bank.jpg', heroAlt: 'Jannie hakend op de bank als begin van het verhaal van Stilte & Draad',
+    eyebrow: 'De toegang', title: 'De Eerste Draad', question: 'Waarom zou ik binnenstappen?', coreLine: 'Alles begint met één draad.', introduction: 'Welkom in mijn wereld van stilte, kleur en draad. Hier groeit ieder werk langzaam vanuit een gevoel, een herinnering of een droom. De eerste draad weet nog niet waar hij eindigt — en juist daarin begint het verhaal.', heroImage: '/photos/jannie-hakend-bank.jpg', heroImageSrcSet: '/photos/jannie-hakend-bank-720.jpg 720w, /photos/jannie-hakend-bank-1200.jpg 1200w, /photos/jannie-hakend-bank.jpg 1800w', heroAlt: 'Jannie hakend op de bank als begin van het verhaal van Stilte & Draad',
     chapters: [{ number: '01', title: 'Het begin', prompt: 'Beginnen vraagt niet om zekerheid. Alleen om inspiratie en de moed om de eerste draad vast te pakken.' }, { number: '02', title: 'De draad', prompt: 'Ik leid de draad en de draad leidt mij. Zo ontstaat de vorm terwijl ik haar maak.' }, { number: '03', title: 'Stap binnen', prompt: 'Kijk niet alleen naar wat het geworden is. Volg de kleuren, vormen en gedachten waaruit het groeide.' }],
     audioLabel: 'De Eerste Draad · spoken word', spokenWordId: 'de-eerste-draad', interactionTitle: 'Weef je eerste draad', interactionText: 'Begin zonder te weten waar je eindigt. Houd de draad vast en beweeg vrij; iedere bocht en kruising brengt jouw vorm dichterbij.', interactionType: 'portal', relatedProductSlug: 'zacht-begin', relatedProductTitle: 'Zacht Begin',
   },

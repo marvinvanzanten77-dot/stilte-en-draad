@@ -1,9 +1,34 @@
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { EditorialZone } from '../data/editorialZones'
-import SpokenWordPlayer from './SpokenWordPlayer'
-import ThreadWeaver from './ThreadWeaver'
-import VeldExperience from './VeldExperience'
-import DreamCards from './DreamCards'
-import SilenceExperience from './SilenceExperience'
+
+const SpokenWordPlayer = lazy(() => import('./SpokenWordPlayer'))
+const ThreadWeaver = lazy(() => import('./ThreadWeaver'))
+const VeldExperience = lazy(() => import('./VeldExperience'))
+const DreamCards = lazy(() => import('./DreamCards'))
+const SilenceExperience = lazy(() => import('./SilenceExperience'))
+
+const DeferredContent = ({ children, className = 'min-h-36' }: { children: ReactNode; className?: string }) => {
+  const anchorRef = useRef<HTMLDivElement>(null)
+  const [shouldRender, setShouldRender] = useState(() => typeof window === 'undefined' || typeof window.IntersectionObserver === 'undefined')
+
+  useEffect(() => {
+    const anchor = anchorRef.current
+    if (!anchor || shouldRender) return
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      setShouldRender(true)
+      observer.disconnect()
+    }, { rootMargin: '300px 0px' })
+
+    observer.observe(anchor)
+    return () => observer.disconnect()
+  }, [shouldRender])
+
+  return <div ref={anchorRef} className={className}>
+    {shouldRender ? <Suspense fallback={<div className={className} aria-hidden="true" />}>{children}</Suspense> : null}
+  </div>
+}
 
 const InteractionArtwork = ({ type }: { type: EditorialZone['interactionType'] }) => {
   if (type === 'field') return <div className="relative h-36 overflow-hidden rounded-xl bg-[#c7b99e]/40">{[18, 34, 52, 71, 86].map((left, index) => <span key={left} className="absolute h-3 w-3 rounded-full border border-[#9b7d4f] bg-[#f3efe6]" style={{ left: `${left}%`, top: `${25 + (index % 3) * 22}%` }} />)}<span className="absolute inset-x-0 bottom-5 h-px bg-[#9b7d4f]/40" /></div>
@@ -16,17 +41,17 @@ const InteractionArtwork = ({ type }: { type: EditorialZone['interactionType'] }
 
 const EditorialZoneLayout = ({ content, continuation = false }: { content: EditorialZone; continuation?: boolean }) => (
   <article className={`overflow-hidden rounded-2xl bg-[#ded2bd] shadow-soft ring-1 ring-neutral-200/40 ${continuation ? 'mt-6' : ''}`}>
-    <header className="grid gap-8 p-7 md:grid-cols-[minmax(0,1fr)_minmax(280px,.9fr)] md:items-center md:p-12">
+    <header className="grid gap-8 p-7 md:p-12 xl:grid-cols-[minmax(0,1fr)_minmax(280px,.9fr)] xl:items-center">
       <div><p className="text-[10px] uppercase tracking-[0.22em] text-neutral-500">{content.eyebrow}</p><h1 className="mt-3 text-3xl font-semibold uppercase tracking-[0.17em]">{content.title}</h1><p className="mt-5 max-w-xl text-lg leading-8 text-neutral-700">{content.coreLine}</p><p className="mt-5 max-w-xl text-sm leading-7 text-neutral-600">{content.introduction}</p><p className="mt-6 text-[10px] uppercase tracking-[0.16em] text-neutral-500">{content.question}</p></div>
       <picture className="block h-full max-h-96 w-full">
         {content.heroImageWebp && <source srcSet={content.heroImageWebp} type="image/webp" />}
-        <img src={content.heroImage} alt={content.heroAlt} loading={continuation ? 'lazy' : 'eager'} decoding="async" className="aspect-[4/3] h-full max-h-96 w-full rounded-xl object-cover shadow-soft" />
+        <img src={content.heroImage} srcSet={content.heroImageSrcSet} sizes={content.heroImageSrcSet ? '(min-width: 1280px) 42vw, (min-width: 768px) calc(100vw - 344px), calc(100vw - 88px)' : undefined} alt={content.heroAlt} loading={continuation ? 'lazy' : 'eager'} fetchPriority={continuation ? 'auto' : 'high'} decoding="async" className="aspect-[4/3] h-full max-h-96 w-full rounded-xl object-cover shadow-soft" />
       </picture>
     </header>
 
     <section className="border-t border-neutral-800/10 p-7 md:p-12" aria-labelledby={`${content.interactionType}-chapters`}><div className="flex items-end justify-between gap-4"><div><p className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">Drie draden</p><h2 id={`${content.interactionType}-chapters`} className="mt-2 text-lg font-semibold uppercase tracking-[0.14em]">Een verhaal in drie bewegingen</h2></div></div><div className="mt-7 grid gap-4 md:grid-cols-3">{content.chapters.map((chapter) => <section key={chapter.number} className="min-h-52 rounded-xl border border-white/45 bg-white/20 p-6"><span className="font-serif text-2xl text-[#9b7d4f]">{chapter.number}</span><h3 className="mt-7 text-sm font-semibold uppercase tracking-[0.14em]">{chapter.title}</h3><p className="mt-3 text-sm leading-6 text-neutral-600">{chapter.prompt}</p><div className="mt-6 h-px w-8 bg-[#9b7d4f]/50" /></section>)}</div></section>
 
-    {content.interactionType === 'field' ? <VeldExperience /> : <section className="grid border-t border-neutral-800/10 md:grid-cols-2"><div className="p-7 md:p-10"><p className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">{content.spokenWordId ? 'Luister' : 'Lees'}</p><h2 className="mt-3 text-lg font-semibold uppercase tracking-[0.14em]">{content.audioLabel}</h2>{content.spokenWordId ? <SpokenWordPlayer id={content.spokenWordId} /> : <><blockquote className="mt-6 border-l border-[#9b7d4f]/60 py-2 pl-5 font-serif text-xl leading-8 text-neutral-700">“{content.coreLine}”</blockquote>{content.readingText && <p className="mt-6 text-sm leading-7 text-neutral-600">{content.readingText}</p>}</>}</div><div className="border-t border-neutral-800/10 p-7 md:border-l md:border-t-0 md:p-10"><p className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">Ervaar</p><h2 className="mt-3 text-lg font-semibold uppercase tracking-[0.14em]">{content.interactionTitle}</h2><p className="mt-3 text-sm leading-6 text-neutral-600">{content.interactionText}</p><div className="relative mt-6">{content.interactionType === 'portal' ? <ThreadWeaver /> : content.interactionType === 'dream' ? <DreamCards /> : content.interactionType === 'ritual' ? <figure><video controls preload="metadata" poster="/videos/rituelen-poster.png" className="aspect-video w-full rounded-xl bg-[#292722] object-cover shadow-[0_14px_30px_rgba(62,48,33,.2)]"><source src="/videos/rituelen.mp4" type="video/mp4" />Je browser ondersteunt deze video niet.</video><figcaption className="mt-3 text-center font-serif text-sm italic text-neutral-500">De handeling verandert. De tijd verandert. De aandacht blijft.</figcaption></figure> : content.interactionType === 'silence' ? <SilenceExperience /> : <InteractionArtwork type={content.interactionType} />}</div></div></section>}
+    {content.interactionType === 'field' ? <DeferredContent className="min-h-[32rem]"><VeldExperience /></DeferredContent> : <section className="grid border-t border-neutral-800/10 md:grid-cols-2"><div className="p-7 md:p-10"><p className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">{content.spokenWordId ? 'Luister' : 'Lees'}</p><h2 className="mt-3 text-lg font-semibold uppercase tracking-[0.14em]">{content.audioLabel}</h2>{content.spokenWordId ? <DeferredContent className="min-h-28"><SpokenWordPlayer id={content.spokenWordId} /></DeferredContent> : <><blockquote className="mt-6 border-l border-[#9b7d4f]/60 py-2 pl-5 font-serif text-xl leading-8 text-neutral-700">“{content.coreLine}”</blockquote>{content.readingText && <p className="mt-6 text-sm leading-7 text-neutral-600">{content.readingText}</p>}</>}</div><div className="border-t border-neutral-800/10 p-7 md:border-l md:border-t-0 md:p-10"><p className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">Ervaar</p><h2 className="mt-3 text-lg font-semibold uppercase tracking-[0.14em]">{content.interactionTitle}</h2><p className="mt-3 text-sm leading-6 text-neutral-600">{content.interactionText}</p><div className="relative mt-6"><DeferredContent>{content.interactionType === 'portal' ? <ThreadWeaver /> : content.interactionType === 'dream' ? <DreamCards /> : content.interactionType === 'ritual' ? <figure><video controls preload="none" poster="/videos/rituelen-poster.png" className="aspect-video w-full rounded-xl bg-[#292722] object-cover shadow-[0_14px_30px_rgba(62,48,33,.2)]"><source src="/videos/rituelen.mp4" type="video/mp4" />Je browser ondersteunt deze video niet.</video><figcaption className="mt-3 text-center font-serif text-sm italic text-neutral-500">De handeling verandert. De tijd verandert. De aandacht blijft.</figcaption></figure> : content.interactionType === 'silence' ? <SilenceExperience /> : <InteractionArtwork type={content.interactionType} />}</DeferredContent></div></div></section>}
 
     <section className="flex flex-col gap-5 border-t border-neutral-800/10 bg-white/15 p-7 sm:flex-row sm:items-center sm:justify-between md:p-10"><div><p className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">Verbonden werk</p><h2 className="mt-2 text-lg font-semibold uppercase tracking-[0.14em]">{content.relatedProductTitle}</h2><p className="mt-2 text-sm text-neutral-600">Een tastbaar vervolg op het verhaal van deze ruimte.</p></div><a href={`/werk/${content.relatedProductSlug}`} className="rounded-full border border-neutral-800/20 px-5 py-3 text-center text-[10px] uppercase tracking-[0.15em] hover:bg-white/35">Bekijk het werk →</a></section>
   </article>

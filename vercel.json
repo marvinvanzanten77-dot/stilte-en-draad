@@ -16,6 +16,6 @@
   "trailingSlash": false,
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/betaling/:orderId", "destination": "/betaling.html" }
+    { "source": "/betaling/:orderId", "destination": "/betaling" }
   ]
 }

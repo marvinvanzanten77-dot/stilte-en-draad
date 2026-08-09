@@ -5,7 +5,7 @@ import { dirname, resolve } from 'node:path'
 import sharp from 'sharp'
 import { indexableSeoRoutes, seoRoutes, type SeoRoute } from './src/data/seo'
 import { siteDetails } from './src/data/siteDetails'
-import { absoluteProductImage, canonicalProductUrl, merchantProducts, SOCIAL_STORY_LINE, SHIPPING_COST_CENTS } from './src/data/reach'
+import { absoluteProductImage, canonicalProductUrl, COMPOSITE_SYNTHETIC_URI, merchantProducts, SOCIAL_STORY_LINE, SHIPPING_COST_CENTS } from './src/data/reach'
 import { productImage, products } from './src/data/products'
 
 const escapeHtml = (value: string) => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')
@@ -64,8 +64,16 @@ const prerenderPlugin = (): Plugin => ({
     const notFound = { path: '/404', title: 'Pagina niet gevonden · Stilte & Draad', description: 'Deze pagina bestaat niet. Keer terug naar het begin van Stilte & Draad.', heading: 'Pagina niet gevonden', image: `${siteDetails.url}/photos/droom-jannie.jpg`, indexable: false } satisfies SeoRoute
     await writeFile(resolve(dist, '404.html'), renderRoute(template, notFound))
     const lastmod = new Date().toISOString().slice(0, 10)
+    const verifiedProductImages = new Set<string>()
     for (const product of merchantProducts) {
       const source = resolve('public', productImage(product).split('?')[0].slice(1))
+      if (!verifiedProductImages.has(source)) {
+        const metadata = await sharp(source).metadata()
+        if (!metadata.xmp?.includes(Buffer.from(COMPOSITE_SYNTHETIC_URI))) {
+          throw new Error(`Merchant-afbeelding mist IPTC DigitalSourceType CompositeSynthetic: ${source}`)
+        }
+        verifiedProductImages.add(source)
+      }
       const output = resolve(dist, 'social', 'products', `${product.slug}.jpg`)
       await mkdir(dirname(output), { recursive: true })
       const photo = await sharp(source).resize(1200, 630, { fit: 'cover', position: 'attention' }).jpeg({ quality: 86 }).toBuffer()

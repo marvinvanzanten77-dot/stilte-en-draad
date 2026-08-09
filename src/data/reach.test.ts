@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import { products } from './products'
-import { buildCampaignUrl, isMerchantProduct, merchantProducts, SHIPPING_COST_CENTS } from './reach'
+import { buildCampaignUrl, COMPOSITE_SYNTHETIC_URI, isMerchantProduct, merchantProducts, SHIPPING_COST_CENTS } from './reach'
 
 describe('bereiklaag uit de canonieke catalogus', () => {
   it('neemt alleen werkelijk koopbare, unieke producten met voorraad op', () => {
-    expect(merchantProducts.length).toBeGreaterThan(0)
+    expect(merchantProducts).toHaveLength(18)
     expect(merchantProducts.every(isMerchantProduct)).toBe(true)
     expect(merchantProducts.some((item) => item.status === 'verkocht' || item.readiness !== 'purchasable')).toBe(false)
     expect(merchantProducts.some((item) => item.duplicateOfProductId !== null)).toBe(false)
+  })
+
+  it('gebruikt de officiële IPTC NewsCode voor samengestelde productbeelden', () => {
+    expect(COMPOSITE_SYNTHETIC_URI).toBe('http://cv.iptc.org/newscodes/digitalsourcetype/compositeSynthetic')
   })
 
   it('houdt prijs, voorraad en verzending gelijk aan de productbron', () => {

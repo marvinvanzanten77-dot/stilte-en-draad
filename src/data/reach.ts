@@ -4,6 +4,7 @@ import { siteDetails } from './siteDetails'
 
 export const SHIPPING_COST_CENTS = 695
 export const SOCIAL_STORY_LINE = 'Handgemaakt textielwerk met een eigen fysiek verhaal.'
+export const COMPOSITE_SYNTHETIC_URI = 'http://cv.iptc.org/newscodes/digitalsourcetype/compositeSynthetic'
 
 export const isMerchantProduct = (product: Product) =>
   product.duplicateOfProductId === null &&

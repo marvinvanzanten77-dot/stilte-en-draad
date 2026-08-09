@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDialogFocus } from '../hooks/useDialogFocus'
-
-type Consent = { necessary: true; analytics: boolean; marketing: boolean; savedAt: string }
-const storageKey = 'stilte-draad-cookie-consent'
+import { readConsent, writeConsent, type Consent } from '../utils/consent'
 
 const CookieConsent = () => {
-  const [hasSavedChoice, setHasSavedChoice] = useState(() => Boolean(localStorage.getItem(storageKey)))
+  const [savedChoice, setSavedChoice] = useState<Consent | null>(() => readConsent(localStorage))
+  const hasSavedChoice = savedChoice !== null
   const [open, setOpen] = useState(() => !hasSavedChoice)
   const [details, setDetails] = useState(false)
-  const [analytics, setAnalytics] = useState(false)
-  const [marketing, setMarketing] = useState(false)
+  const [analytics, setAnalytics] = useState(() => savedChoice?.analytics ?? false)
+  const [marketing, setMarketing] = useState(() => savedChoice?.marketing ?? false)
   const dialogRef = useRef<HTMLDivElement>(null)
   const closeSavedSettings = useCallback(() => {
     if (hasSavedChoice) setOpen(false)
@@ -17,18 +16,23 @@ const CookieConsent = () => {
   useDialogFocus(open, dialogRef, hasSavedChoice ? closeSavedSettings : undefined)
 
   useEffect(() => {
-    const reopen = () => setOpen(true)
+    const reopen = () => {
+      const current = readConsent(localStorage)
+      setAnalytics(current?.analytics ?? false)
+      setMarketing(current?.marketing ?? false)
+      setDetails(true)
+      setOpen(true)
+    }
     window.addEventListener('open-cookie-settings', reopen)
     return () => window.removeEventListener('open-cookie-settings', reopen)
   }, [])
 
   const save = (choice: Pick<Consent, 'analytics' | 'marketing'>) => {
-    const consent: Consent = { necessary: true, ...choice, savedAt: new Date().toISOString() }
-    localStorage.setItem(storageKey, JSON.stringify(consent))
+    const consent = writeConsent(localStorage, choice)
     setAnalytics(choice.analytics)
     setMarketing(choice.marketing)
-    setHasSavedChoice(true)
-    setOpen(false)
+    setSavedChoice(consent)
+    if (consent) setOpen(false)
   }
 
   if (!open) return null

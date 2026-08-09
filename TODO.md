@@ -2,6 +2,16 @@
 
 Dit bestand bevat uitsluitend werkzaamheden die nog niet aantoonbaar zijn afgerond.
 
+## Afgeronde publicatiefase — 9 augustus 2026
+
+- [x] Transactionele communicatie personaliseren met Jannies toon en het bijbehorende werkverhaal.
+- [x] Bij ieder verkoopbaar werk duidelijk maken dat de fysieke begeleidende tekst wordt meegeleverd.
+- [x] Versiebeheer en blijvende opslag voor cookievoorkeuren implementeren en testen.
+- [x] De technische SEO-basis publiceren: route-eigen metadata, canonicals, geldige JSON-LD, sitemap, robots en echte HTTP 404.
+- [x] De performanceoptimalisatie publiceren: responsieve homepagehero en uitgestelde initialisatie van niet-kritieke audio, video en interactieve ervaringen.
+- [x] De footercredit wijzigen naar `© 2026 Stilte & Draad · door InnerVerse Studios`.
+- [x] Deze fase op Production controleren op desktop en mobiele viewports, zonder bestelling, betaling, donatie of e-mail aan te maken.
+
 ## Winkel, betalingen en donaties
 
 - [x] Een aparte Neon PostgreSQL-database aan Vercel Preview en Development koppelen en met migraties en echte databasetests valideren.
@@ -52,7 +62,7 @@ Dit bestand bevat uitsluitend werkzaamheden die nog niet aantoonbaar zijn afgero
 - [x] Alle zes kaartvideo’s optimaliseren, koppelen en technisch testen.
 - [ ] De resterende audio- en videobestanden waar nodig verder optimaliseren voor webgebruik.
 - [ ] Alle interactieve onderdelen op mobiel en tablet testen.
-- [ ] Lighthouse-controle uitvoeren op performance, toegankelijkheid en SEO.
+- [x] Lighthouse-controle uitvoeren op performance, toegankelijkheid en SEO.
 
 ## Productpresentatie en vertrouwen
 

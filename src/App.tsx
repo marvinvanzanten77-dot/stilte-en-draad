@@ -4,9 +4,8 @@ import ZoneContainer from './components/ZoneContainer'
 import Footer from './components/Footer'
 import LegalPage from './pages/LegalPage'
 import ProductPage from './pages/ProductPage'
-import { getProduct, productImage } from './data/products'
+import { getProduct } from './data/products'
 import { editorialZones } from './data/editorialZones'
-import { events } from './data/events'
 import { ShopProvider } from './context/ShopContext'
 import { zones, type ZoneId } from './data/zones'
 import CookieConsent from './components/CookieConsent'
@@ -80,7 +79,7 @@ function AppContent() {
       if (product) {
         title = `${product.title} · Stilte & Draad`
         description = `${product.description} Handgemaakt, uniek werk van Jannie van Zanten.`
-        image = new URL(productImage(product), siteUrl).href
+        image = routeSeo?.image ?? image
       }
     } else if (!notFound && !standaloneRoute) {
       const zoneTitle = zones.find((zone) => zone.id === activeZone)?.label.toLocaleLowerCase('nl-NL').replace(/(^|\s)\S/g, (letter) => letter.toUpperCase())
@@ -111,7 +110,15 @@ function AppContent() {
     setMeta('meta[property="og:type"]', { property: 'og:type', content: routeType === 'werk' ? 'product' : 'website' })
     setMeta('meta[property="og:url"]', { property: 'og:url', content: canonicalUrl })
     setMeta('meta[property="og:image"]', { property: 'og:image', content: image })
+    setMeta('meta[property="og:image:secure_url"]', { property: 'og:image:secure_url', content: image })
     setMeta('meta[property="og:image:alt"]', { property: 'og:image:alt', content: `${title} — beeld van Stilte & Draad` })
+    if (routeSeo?.type === 'product' && routeSeo.price !== undefined) {
+      setMeta('meta[property="product:price:amount"]', { property: 'product:price:amount', content: routeSeo.price.toFixed(2) })
+      setMeta('meta[property="product:price:currency"]', { property: 'product:price:currency', content: 'EUR' })
+    } else {
+      document.head.querySelector('meta[property="product:price:amount"]')?.remove()
+      document.head.querySelector('meta[property="product:price:currency"]')?.remove()
+    }
     setMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' })
     setMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: title })
     setMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description })
@@ -130,78 +137,6 @@ function AppContent() {
       document.head.appendChild(routeStructuredData)
     }
 
-    document.getElementById('product-structured-data')?.remove()
-    if (routeType === 'werk' && slug && !routeSeo?.structuredData) {
-      const product = getProduct(slug)
-      if (product) {
-        const structuredData = document.createElement('script')
-        structuredData.id = 'product-structured-data'
-        structuredData.type = 'application/ld+json'
-        structuredData.text = JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'Product',
-          name: product.title,
-          description: product.description,
-          image: new URL(productImage(product), siteUrl).href,
-          sku: `SD-${String(product.id).padStart(4, '0')}`,
-          brand: { '@type': 'Brand', name: 'Stilte & Draad' },
-          manufacturer: { '@type': 'Person', name: 'Jannie van Zanten' },
-          offers: {
-            '@type': 'Offer',
-            priceCurrency: 'EUR',
-            price: product.price.toFixed(2),
-            availability: product.readiness === 'purchasable' && product.status === 'beschikbaar' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-            seller: { '@id': `${siteUrl}/#organisatie` },
-            url: `${siteUrl}/werk/${product.slug}`,
-          },
-        })
-        document.head.appendChild(structuredData)
-      }
-    }
-    document.getElementById('event-structured-data')?.remove()
-    if (activeZone === 'evenementen') {
-      const structuredData = document.createElement('script')
-      structuredData.id = 'event-structured-data'
-      structuredData.type = 'application/ld+json'
-      structuredData.text = JSON.stringify(events.map((event) => ({
-        '@context': 'https://schema.org',
-        '@type': 'Event',
-        name: event.title,
-        description: event.description,
-        startDate: `${event.date}T${event.startTime}:00+02:00`,
-        endDate: `${event.date}T${event.endTime}:00+02:00`,
-        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-        eventStatus: 'https://schema.org/EventScheduled',
-        isAccessibleForFree: true,
-        location: {
-          '@type': 'Place',
-          name: event.locationNote,
-          address: {
-            '@type': 'PostalAddress',
-            streetAddress: event.street,
-            addressLocality: event.city,
-            addressCountry: 'NL',
-          },
-        },
-        performer: { '@type': 'Person', name: 'Jannie van Zanten', url: `${siteUrl}/veld` },
-        organizer: {
-          '@type': 'Organization',
-          name: siteDetails.name,
-          url: siteUrl,
-          email: siteDetails.email,
-        },
-        offers: {
-          '@type': 'Offer',
-          price: '0',
-          priceCurrency: 'EUR',
-          availability: 'https://schema.org/InStock',
-          url: `${siteUrl}/evenementen`,
-        },
-        url: `${siteUrl}/evenementen#${event.id}`,
-        image: new URL(event.image, siteUrl).href,
-      })))
-      document.head.appendChild(structuredData)
-    }
   }, [activeZone, path])
 
   const renderRoute = () => {

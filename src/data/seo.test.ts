@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { indexableSeoRoutes, seoForPath, seoRoutes } from './seo'
 import { products } from './products'
+import { isMerchantProduct } from './reach'
 
 describe('SEO-routes', () => {
   it('heeft unieke titles, descriptions, paden en canonieke publieke routes', () => {
@@ -22,7 +23,11 @@ describe('SEO-routes', () => {
       const route = seoForPath(`/werk/${product.slug}`)
       expect(route?.type).toBe('product')
       expect(JSON.stringify(route?.structuredData)).toContain('Offer')
+      expect(JSON.stringify(route?.structuredData)).toContain('MerchantReturnPolicy')
+      expect(JSON.stringify(route?.structuredData)).toContain('OfferShippingDetails')
+      expect(JSON.stringify(route?.structuredData)).toContain('ImageObject')
       expect(route?.description).toContain('eigen bijbehorende tekst')
+      if (isMerchantProduct(product)) expect(route?.image).toMatch(/\/social\/products\/.+\.jpg$/)
     }
   })
 })

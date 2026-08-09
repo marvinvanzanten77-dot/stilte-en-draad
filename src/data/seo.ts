@@ -1,6 +1,7 @@
 import { products, productImage } from './products'
 import { siteDetails } from './siteDetails'
 import { events } from './events'
+import { absoluteProductImage, isMerchantProduct, socialProductImage, SHIPPING_COST_CENTS } from './reach'
 
 export type SeoRoute = {
   path: string
@@ -10,6 +11,7 @@ export type SeoRoute = {
   image: string
   indexable: boolean
   type?: 'website' | 'product'
+  price?: number
   structuredData?: Record<string, unknown> | Record<string, unknown>[]
 }
 
@@ -48,15 +50,25 @@ const productPages: SeoRoute[] = products.filter((product) => product.duplicateO
     title: `${product.title} · handgemaakte textielkunst · Stilte & Draad`,
     description: `${product.description} Uniek handgemaakt werk van Jannie van Zanten, fysiek geleverd met zijn eigen bijbehorende tekst.`,
     heading: product.title,
-    image: new URL(productImage(product), url).href,
+    image: isMerchantProduct(product) ? socialProductImage(product) : absoluteProductImage(product),
     indexable: true,
     type: 'product',
+    price: product.price,
     structuredData: [breadcrumb(product.title, path), {
       '@context': 'https://schema.org', '@type': 'Product', name: product.title, description: product.description,
-      image: new URL(productImage(product), url).href, sku: `SD-${String(product.id).padStart(4, '0')}`,
+      image: [absoluteProductImage(product), socialProductImage(product)], sku: `SD-${String(product.id).padStart(4, '0')}`,
       itemCondition: 'https://schema.org/NewCondition', brand: { '@type': 'Brand', name: 'Stilte & Draad' },
       manufacturer: { '@type': 'Person', '@id': `${url}/#jannie`, name: siteDetails.maker },
-      offers: { '@type': 'Offer', priceCurrency: 'EUR', price: product.price.toFixed(2), availability: available ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock', seller: { '@id': `${url}/#organisatie` }, url: `${url}${path}` },
+      creator: { '@type': 'Person', '@id': `${url}/#jannie`, name: siteDetails.maker },
+      copyrightHolder: { '@type': 'Organization', '@id': `${url}/#organisatie`, name: siteDetails.name },
+      offers: {
+        '@type': 'Offer', priceCurrency: 'EUR', price: product.price.toFixed(2),
+        availability: available ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        itemCondition: 'https://schema.org/NewCondition', seller: { '@id': `${url}/#organisatie` }, url: `${url}${path}`,
+        shippingDetails: { '@type': 'OfferShippingDetails', shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'NL' }, shippingRate: { '@type': 'MonetaryAmount', value: (SHIPPING_COST_CENTS / 100).toFixed(2), currency: 'EUR' }, deliveryTime: { '@type': 'ShippingDeliveryTime', handlingTime: { '@type': 'QuantitativeValue', minValue: 2, maxValue: 5, unitCode: 'DAY' } } },
+        hasMerchantReturnPolicy: { '@type': 'MerchantReturnPolicy', applicableCountry: 'NL', returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow', merchantReturnDays: 14, returnMethod: 'https://schema.org/ReturnByMail', returnFees: 'https://schema.org/ReturnShippingFees' },
+      },
+      subjectOf: { '@type': 'ImageObject', contentUrl: absoluteProductImage(product), creator: { '@id': `${url}/#jannie` }, creditText: 'Handwerk door Jannie van Zanten; achtergrond en presentatie kunnen digitaal of met AI zijn bewerkt.', copyrightNotice: `© 2026 ${siteDetails.name}` },
     }],
   }
 })

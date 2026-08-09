@@ -53,6 +53,7 @@ export const createResendProvider = (): EmailProvider => {
           to: [message.recipient],
           subject: content.subject,
           text: content.text,
+          html: content.html,
           ...(config.replyTo ? { reply_to: config.replyTo } : {}),
         }),
       })

@@ -314,7 +314,7 @@ export const applyPaymentStatus = async (orderId: string, status: OrderStatus) =
     : ['failed', 'canceled', 'expired'].includes(status) ? 'payment_failed_or_canceled'
       : status === 'paid' ? 'payment_succeeded' : null
   if (messageType && order.customer_email) await sql`insert into email_outbox (order_id, message_type, recipient_email, payload)
-    values (${orderId}, ${messageType}, ${order.customer_email}, ${sql.json({ orderId })})
+    values (${orderId}, ${messageType}, ${order.customer_email}, ${sql.json({ orderId, paymentStatus: status })})
     on conflict (order_id, message_type) do nothing`
   return status
 })
@@ -354,9 +354,28 @@ export const claimPendingEmails = async (limit: number): Promise<EmailMessage[]>
       for update skip locked
       limit ${limit}
     )
-    update email_outbox e set status = 'processing', attempts = attempts + 1, updated_at = now()
-    from candidates where e.id = candidates.id
-    returning e.id, e.order_id, e.message_type, e.recipient_email, e.payload
+    ), claimed as (
+      update email_outbox e set status = 'processing', attempts = attempts + 1, updated_at = now()
+      from candidates where e.id = candidates.id
+      returning e.id, e.order_id, e.message_type, e.recipient_email, e.payload
+    )
+    select c.id, c.order_id, c.message_type, c.recipient_email,
+      jsonb_build_object(
+        'customerName', o.customer_name,
+        'orderNumber', o.order_number,
+        'orderKind', o.kind,
+        'paymentStatus', o.status,
+        'subtotalCents', o.subtotal_cents,
+        'shippingCents', o.shipping_cents,
+        'totalCents', o.total_cents,
+        'fulfillment', o.fulfillment,
+        'address', o.address,
+        'postalCode', o.postal_code,
+        'city', o.city,
+        'country', o.country,
+        'items', coalesce((select jsonb_agg(jsonb_build_object('title', oi.title, 'unitPriceCents', oi.unit_price_cents) order by oi.id) from order_items oi where oi.order_id = o.id), '[]'::jsonb)
+      ) || c.payload as payload
+    from claimed c join orders o on o.id = c.order_id
   `
   return rows.map((row) => ({
     outboxId: row.id,

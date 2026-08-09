@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { emailContent, processEmailOutbox, withdrawalConfirmationContent, type EmailMessage, type EmailMessageType } from './email.js'
+import { emailContent, escapeEmailHtml, processEmailOutbox, withdrawalConfirmationContent, type EmailMessage, type EmailMessageType } from './email.js'
 import { createResendProvider, emailConfigurationState, validProcessingSecret } from './resend.js'
 import emailProcessHandler, { authorized } from '../email/process.js'
 
@@ -27,6 +27,7 @@ describe('e-mail-outbox', () => {
     expect(content.subject).toContain('HER-20260727-ABC12345')
     expect(content.text).toContain('gehele bestelling')
     expect(content.text).toContain('marvinvanzanten77@gmail.com')
+    expect(content.html).toContain('herroepingsverzoek')
   })
 
   it('vangt providerfouten af en plant een retry zonder de betaalflow te laten falen', async () => {
@@ -56,6 +57,7 @@ describe('e-mail-outbox', () => {
       const content = emailContent({ ...message, type, payload: type === 'withdrawal_received' ? { requestNumber: 'HER-1', receivedAt: '2026-08-01T10:00:00.000Z', scope: 'full' } : {} })
       expect(content.subject.length).toBeGreaterThan(8)
       expect(content.text).toContain('Stilte & Draad')
+      expect(content.html).toContain('Stilte &amp; Draad')
     }
   })
 
@@ -64,10 +66,40 @@ describe('e-mail-outbox', () => {
       ...message,
       payload: { fulfillment: 'shipping', shippingCents: 695, address: 'Dorpsstraat 2 A', postalCode: '4053 JV', city: 'IJzendoorn', country: 'NL' },
     })
-    expect(shipping.text).toContain('€ 6,95')
+    expect(shipping.text).toContain('€ 6,95')
     expect(shipping.text).toContain('Dorpsstraat 2 A\n4053 JV IJzendoorn\nNederland')
     const pickup = emailContent({ ...message, payload: { fulfillment: 'pickup', shippingCents: 0 } })
-    expect(pickup.text).toContain('Afhalen op afspraak in IJzendoorn')
+    expect(pickup.text).toContain('afhalen op afspraak in IJzendoorn')
+  })
+
+  it('personaliseert met de voornaam en gebruikt een natuurlijke fallback', () => {
+    const personal = emailContent({ ...message, payload: { customerName: 'Jannie van Zanten', fulfillment: 'pickup' } })
+    expect(personal.text).toContain('Lieve Jannie,')
+    const fallback = emailContent({ ...message, payload: { fulfillment: 'pickup' } })
+    expect(fallback.text).toContain('Hallo,')
+    expect(fallback.text).not.toContain('undefined')
+  })
+
+  it('escapet klant- en ordergegevens in HTML en zet geen persoonsgegevens in het onderwerp', () => {
+    const content = emailContent({ ...message, payload: { customerName: '<Jannie & Co>', items: [{ title: '<script>alert(1)</script>' }], fulfillment: 'pickup' } })
+    expect(content.html).not.toContain('<script>alert(1)</script>')
+    expect(content.html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;')
+    expect(content.subject).not.toContain('Jannie')
+    expect(escapeEmailHtml('"<>&\'')).toBe('&quot;&lt;&gt;&amp;&#39;')
+  })
+
+  it('benoemt werken, bedragen, het fysieke verhaal en iedere uitkomst afzonderlijk', () => {
+    const payload = { customerName: 'Marvin', orderNumber: 'SD-1', items: [{ title: 'Vrije Lucht' }, { title: 'Onbezorgd' }], subtotalCents: 7000, shippingCents: 695, totalCents: 7695, fulfillment: 'shipping', address: 'Draadstraat 1', postalCode: '1234 AB', city: 'Utrecht', country: 'NL' }
+    const received = emailContent({ ...message, type: 'order_received', payload })
+    const paid = emailContent({ ...message, type: 'payment_succeeded', payload })
+    expect(received.text).toContain('Vrije Lucht, Onbezorgd')
+    expect(received.text).toContain('€ 76,95')
+    expect(paid.text).toContain('fysiek de eigen bijbehorende tekst')
+    expect(emailContent({ ...message, type: 'payment_failed_or_canceled', payload: { ...payload, paymentStatus: 'failed' } }).subject).toContain('niet gelukt')
+    expect(emailContent({ ...message, type: 'payment_failed_or_canceled', payload: { ...payload, paymentStatus: 'canceled' } }).subject).toContain('geannuleerd')
+    expect(emailContent({ ...message, type: 'payment_failed_or_canceled', payload: { ...payload, paymentStatus: 'expired' } }).subject).toContain('verlopen')
+    expect(emailContent({ ...message, type: 'payment_review', payload }).text).toContain('niets opnieuw te betalen')
+    expect(emailContent({ ...message, type: 'donation_confirmed', payload: { customerName: 'Marvin', totalCents: 250 } }).text).toContain('€ 2,50')
   })
 
   it('houdt de provider uitgeschakeld zonder complete expliciete configuratie', () => {
@@ -100,6 +132,9 @@ describe('e-mail-outbox', () => {
     const secondHeaders = fetchMock.mock.calls[1]?.[1]?.headers as Record<string, string>
     expect(firstHeaders['Idempotency-Key']).toBe('stilte-en-draad-outbox-1')
     expect(secondHeaders['Idempotency-Key']).toBe(firstHeaders['Idempotency-Key'])
+    const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body)) as Record<string, unknown>
+    expect(body.html).toContain('<!doctype html>')
+    expect(body.text).toContain('Stilte & Draad')
   })
 
   it('houdt de verwerkingsroute dicht zonder configuratie en weigert een verkeerd geheim', async () => {

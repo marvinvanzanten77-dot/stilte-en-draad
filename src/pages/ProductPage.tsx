@@ -3,6 +3,7 @@ import { formatCents } from '../utils/money'
 import { useShop } from '../context/ShopContext'
 import { useProductAvailability } from '../hooks/useProductAvailability'
 import { companionStoryShort } from '../data/companionStory'
+import ProductImageDisclosure from '../components/ProductImageDisclosure'
 
 type ProductPageProps = { product: Product; navigate: (path: string) => void; certificate?: boolean }
 
@@ -34,10 +35,13 @@ const ProductPage = ({ product, navigate, certificate = false }: ProductPageProp
   const related = products.filter((item) => item.category === product.category && item.id !== product.id && item.duplicateOfProductId === null).slice(0, 3)
   return (
     <div className="space-y-7">
-      <article className="overflow-hidden rounded-2xl bg-[#e7ddc9] shadow-soft"><div className="grid md:grid-cols-2">
-        <div className="relative min-h-0 overflow-hidden">
-          <img src={productImage(product)} alt={product.title} className="h-full max-h-[760px] w-full object-cover" />
-          {sold && <div className="absolute inset-0 flex items-center justify-center bg-neutral-950/20" aria-label="Dit werk is verkocht"><span className="border-y-2 border-white/75 bg-neutral-950/55 px-8 py-4 text-2xl font-bold uppercase tracking-[0.24em] text-white shadow-lg backdrop-blur-[1px] md:text-4xl">Verkocht</span></div>}
+      <article className="overflow-hidden rounded-2xl bg-[#e7ddc9] shadow-soft"><div className="grid xl:grid-cols-2">
+        <div className="flex min-h-0 flex-col overflow-hidden">
+          <div className="relative min-h-0 flex-1 overflow-hidden">
+            <img src={productImage(product)} alt={product.title} className="h-full max-h-[760px] w-full object-cover" />
+            {sold && <div className="absolute inset-0 flex items-center justify-center bg-neutral-950/20" aria-label="Dit werk is verkocht"><span className="border-y-2 border-white/75 bg-neutral-950/55 px-8 py-4 text-2xl font-bold uppercase tracking-[0.24em] text-white shadow-lg backdrop-blur-[1px] md:text-4xl">Verkocht</span></div>}
+          </div>
+          <ProductImageDisclosure />
         </div>
         <div className="flex flex-col p-8 md:p-12"><p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">{product.category} · S&amp;D-{String(product.id).padStart(4, '0')}</p><h1 className="mt-5 text-3xl font-semibold uppercase tracking-[0.14em]">{product.title}</h1><div className="my-7 h-px w-12 bg-[#c6a978]" /><p className="text-sm leading-7 text-neutral-700">{product.description}</p>{measurements && <p className="mt-4 text-xs uppercase tracking-[0.14em] text-neutral-500">{measurements}</p>}{product.materials?.length ? <p className="mt-2 text-xs uppercase tracking-[0.14em] text-neutral-500">Materiaal: {product.materials.join(' · ')}</p> : null}{product.careInstructions ? <p className="mt-2 text-xs leading-5 text-neutral-600">Onderhoud: {product.careInstructions}</p> : null}{product.handmadeVariationNotice ? <p className="mt-2 text-xs leading-5 text-neutral-600">Handgemaakt: {product.handmadeVariationNotice}</p> : null}{product.fragile ? <p className="mt-2 text-xs font-medium uppercase tracking-[0.14em] text-[#8a6b43]">Fragiel werk</p> : null}<p className="mt-6 text-sm italic leading-7 text-neutral-600">Iedere draad draagt een stukje van mijn leven. Samen vormen zij een verhaal in kleuren en vormen.</p><div className="mt-auto pt-10"><p className="text-2xl font-semibold">{formatCents(product.price * 100)}</p><p className="mt-2 text-xs uppercase tracking-[0.14em] text-neutral-500">{sold ? 'Heeft een thuis gevonden' : availability === 'reserved' ? 'Tijdelijk voor iemand bewaard' : readyToBuy ? product.unique ? 'Handgemaakt · uniek werk' : 'Handgemaakt · beperkte voorraad' : 'Tentoonstellingswerk · binnenkort bestelbaar'}</p><div className="mt-5 grid gap-3 sm:grid-cols-2"><button type="button" disabled={sold || !readyToBuy || (availability !== 'available' && !cart.includes(product.id))} onClick={() => { const adding = !cart.includes(product.id); toggleCart(product.id); if (adding) openCart() }} className="rounded-full bg-neutral-900 px-4 py-3 text-xs uppercase tracking-[0.14em] text-white disabled:cursor-not-allowed disabled:opacity-45">{sold ? 'Verkocht' : cart.includes(product.id) ? 'Uit winkelmand' : !readyToBuy ? 'Binnenkort bestelbaar' : availability === 'reserved' ? 'Gereserveerd' : 'In winkelmand'}</button><button type="button" onClick={() => toggleFavorite(product.id)} className="rounded-full border border-neutral-800/20 px-4 py-3 text-xs uppercase tracking-[0.14em]">{favorites.includes(product.id) ? 'Favoriet ♥' : 'Bewaar ♡'}</button></div>{readyToBuy && <p className="mt-4 rounded-xl border border-neutral-800/10 bg-white/25 p-4 text-xs leading-5 text-neutral-600">{companionStoryShort}</p>}<button type="button" onClick={() => navigate(`/certificaat/${product.slug}`)} className="mt-5 text-[10px] uppercase tracking-[0.16em] underline underline-offset-4">Bekijk digitaal certificaat</button></div></div>
       </div></article>

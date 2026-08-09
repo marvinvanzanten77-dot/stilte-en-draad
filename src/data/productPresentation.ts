@@ -1,0 +1,1 @@
+export const productImageDisclosure = 'Presentatiebeeld: de achtergrond en setting zijn digitaal bewerkt en deels met AI samengesteld. Het aangeboden handwerk zelf is niet digitaal gewijzigd. Raadpleeg de productomschrijving voor de werkelijke afmetingen en materialen.'

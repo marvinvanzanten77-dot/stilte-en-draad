@@ -10,9 +10,8 @@ describe('productgereedheid', () => {
     expect(products.filter((product) => product.readiness === 'purchasable').every((product) => product.companionTextReady && product.companionTextType === 'eigen verhaal')).toBe(true)
   })
 
-  it('blokkeert onvolledige en dubbele vermeldingen', () => {
+  it('blokkeert onvolledige vermeldingen', () => {
     expect(products.find((product) => product.id === 11)?.readiness).toBe('display_only')
-    expect(products.find((product) => product.id === 14)?.readiness).toBe('display_only')
     expect(products.find((product) => product.id === 23)?.readiness).toBe('display_only')
   })
 

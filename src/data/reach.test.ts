@@ -4,7 +4,7 @@ import { buildCampaignUrl, COMPOSITE_SYNTHETIC_URI, isMerchantProduct, merchantP
 
 describe('bereiklaag uit de canonieke catalogus', () => {
   it('neemt alleen werkelijk koopbare, unieke producten met voorraad op', () => {
-    expect(merchantProducts).toHaveLength(18)
+    expect(merchantProducts).toHaveLength(19)
     expect(merchantProducts.every(isMerchantProduct)).toBe(true)
     expect(merchantProducts.some((item) => item.status === 'verkocht' || item.readiness !== 'purchasable')).toBe(false)
     expect(merchantProducts.some((item) => item.duplicateOfProductId !== null)).toBe(false)

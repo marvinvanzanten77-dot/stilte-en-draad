@@ -15,11 +15,11 @@ Google kan verwerking en goedkeuring niet garanderen. Controleer na wijzigingen 
 
 ## Herkomstmarkering van productfoto’s
 
-De productpagina vertelt eerlijk dat achtergronden en settings digitaal of deels met AI zijn samengesteld. Alle 18 Merchant-vermeldingen verwijzen daarom naar een publiek productbeeld met IPTC `DigitalSourceType`:
+De productpagina vertelt eerlijk dat achtergronden en settings digitaal of deels met AI zijn samengesteld. Alle 19 Merchant-vermeldingen verwijzen daarom naar een publiek productbeeld met IPTC `DigitalSourceType`:
 
 `http://cv.iptc.org/newscodes/digitalsourcetype/compositeSynthetic`
 
-Dit is de officiële IPTC NewsCode voor een samengesteld beeld waarvan minstens één element generatieve AI bevat. De 18 vermeldingen gebruiken 17 unieke beeldbestanden, omdat twee vermeldingen hetzelfde publieke bronbestand delen. De metadata is zonder hercodering toegevoegd: pixels, kleur, uitsnede, resolutie en compressiedata zijn niet gewijzigd. De productiebuild controleert de markering voortaan voordat de feed wordt geschreven en stopt wanneer een feedbeeld haar mist.
+Dit is de officiële IPTC NewsCode voor een samengesteld beeld waarvan minstens één element generatieve AI bevat. De 19 vermeldingen gebruiken 18 unieke beeldbestanden, omdat twee vermeldingen hetzelfde publieke bronbestand delen. De metadata is zonder hercodering toegevoegd: pixels, kleur, uitsnede, resolutie en compressiedata zijn niet gewijzigd. De productiebuild controleert de markering voortaan voordat de feed wordt geschreven en stopt wanneer een feedbeeld haar mist.
 
 ## Titels en beschrijvingen
 

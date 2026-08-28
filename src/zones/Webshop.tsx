@@ -15,7 +15,6 @@ const Webshop = ({ navigate }: { navigate: (path: string) => void }) => {
 
   const visibleProducts = useMemo(
     () => products
-      .filter((product) => product.duplicateOfProductId === null)
       .filter((product) => activeCategory === 'Alles' || product.category === activeCategory)
       .filter((product) => !favoritesOnly || favorites.includes(product.id))
       .filter((product) => `${product.title} ${product.description}`.toLowerCase().includes(query.toLowerCase()))

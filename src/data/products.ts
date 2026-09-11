@@ -63,6 +63,7 @@ const entries: ProductEntry[] = [
   { id: 25, title: 'Stille Zon', category: 'Wandwerken', description: 'Een open cirkel in warme zandtinten, met lange draden die het licht vangen en de ruimte zacht laten ademen.', price: 49 },
   { id: 26, title: 'Zachte Reis', category: 'Tassen', description: 'Een handgemaakte tas in rustige zandtinten, waarin iedere steek iets van warmte en onderweg zijn meedraagt.', price: 49 },
   { id: 27, title: 'Lichtspoor', category: 'Objecten', description: 'Vier kleine ringen volgen elkaar in het licht, verbonden als momenten die samen één stille lijn vormen.', price: 12.5 },
+  { id: 28, title: 'Avondbloesem', category: 'Tassen', description: 'Dieppaars textiel valt in zachte franjes rond heldere handvatten, met binnenin een levendig patroon als een verborgen bloem.', price: 39 },
 ]
 
 const slugify = (title: string) => title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
@@ -94,6 +95,7 @@ const productUpdates: Record<number, Partial<Product>> = {
   25: { readiness: 'purchasable', diameterCm: 40, materials: ['katoen'], depthNotApplicable: true, careInstructions: 'Uitsluitend bestemd voor gebruik binnenshuis.' },
   26: { readiness: 'purchasable', widthCm: 28, heightCm: 23, depthCm: 14, materials: ['polyester'], careInstructions: 'Niet te zwaar vullen om vorm en handwerk te behouden.' },
   27: { readiness: 'purchasable', widthCm: 12, heightCm: 75, materials: ['ringen', 'katoen'], depthNotApplicable: true, careInstructions: 'Uitsluitend bestemd voor gebruik binnenshuis.' },
+  28: { readiness: 'purchasable', widthCm: 20, heightCm: 15, depthCm: 13, materials: ['polyester'], careInstructions: 'Niet te zwaar vullen om vorm en handwerk te behouden.' },
 }
 
 export const products: Product[] = entries.map<Product>((product) => ({

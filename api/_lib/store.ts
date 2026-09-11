@@ -1,4 +1,5 @@
 import postgres from 'postgres'
+import { createHash } from 'node:crypto'
 import { rateLimitAllowed } from './security.js'
 import type { EmailMessage, EmailMessageType, EmailOutboxRepository } from './email.js'
 
@@ -61,6 +62,79 @@ export const rateLimit = async (key: string, limit: number, seconds: number) => 
     returning count
   `
   return rateLimitAllowed(row.count, limit)
+}
+
+export const normalizeAnalyticsPath = (path: string) => {
+  const clean = path.trim().split('?')[0]?.split('#')[0] || '/'
+  if (!clean.startsWith('/')) return '/'
+  if (clean.length > 160) return clean.slice(0, 160)
+  return clean
+}
+
+export const analyticsVisitorHash = (day: string, visitorKey: string) =>
+  createHash('sha256').update(`stilte-en-draad:${day}:${visitorKey}`).digest('hex')
+
+export const recordAnalyticsPageView = async (input: { path: string; visitorKey: string; day?: string }) => {
+  const day = input.day ?? new Date().toISOString().slice(0, 10)
+  const path = normalizeAnalyticsPath(input.path)
+  const visitorHash = analyticsVisitorHash(day, input.visitorKey)
+  await db().begin(async (sql) => {
+    await sql`
+      insert into analytics_daily_routes (day, path, views)
+      values (${day}, ${path}, 1)
+      on conflict (day, path) do update set
+        views = analytics_daily_routes.views + 1,
+        updated_at = now()
+    `
+    await sql`
+      insert into analytics_daily_visitors (day, visitor_hash)
+      values (${day}, ${visitorHash})
+      on conflict (day, visitor_hash) do nothing
+    `
+  })
+}
+
+export type AnalyticsDailySummary = {
+  day: string
+  totalViews: number
+  uniqueVisitors: number
+  routes: Array<{ path: string; views: number }>
+}
+
+export const getAnalyticsDailySummary = async (day: string): Promise<AnalyticsDailySummary> => {
+  const [totals] = await db()<Array<{ total_views: number; unique_visitors: number }>>`
+    select
+      coalesce((select sum(views)::int from analytics_daily_routes where day = ${day}), 0) as total_views,
+      coalesce((select count(*)::int from analytics_daily_visitors where day = ${day}), 0) as unique_visitors
+  `
+  const routes = await db()<Array<{ path: string; views: number }>>`
+    select path, views from analytics_daily_routes where day = ${day} order by views desc, path asc limit 12
+  `
+  return {
+    day,
+    totalViews: totals?.total_views ?? 0,
+    uniqueVisitors: totals?.unique_visitors ?? 0,
+    routes,
+  }
+}
+
+export const markAnalyticsReportSent = async (day: string, recipient: string, providerId: string | null) => {
+  await db()`
+    insert into analytics_daily_reports (day, recipient_email, status, provider_id, sent_at)
+    values (${day}, ${recipient}, 'sent', ${providerId}, now())
+    on conflict (day, recipient_email) do update set
+      status = 'sent',
+      provider_id = excluded.provider_id,
+      sent_at = coalesce(analytics_daily_reports.sent_at, now()),
+      last_error_code = null
+  `
+}
+
+export const analyticsReportAlreadySent = async (day: string, recipient: string) => {
+  const [row] = await db()<Array<{ status: string }>>`
+    select status from analytics_daily_reports where day = ${day} and recipient_email = ${recipient}
+  `
+  return row?.status === 'sent'
 }
 
 export const findByIdempotencyKey = async (key: string) => {

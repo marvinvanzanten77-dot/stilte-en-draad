@@ -9,6 +9,7 @@ import { editorialZones } from './data/editorialZones'
 import { ShopProvider } from './context/ShopContext'
 import { zones, type ZoneId } from './data/zones'
 import CookieConsent from './components/CookieConsent'
+import AnalyticsTracker from './components/AnalyticsTracker'
 import CheckoutPage from './pages/CheckoutPage'
 import DonationPage from './pages/DonationPage'
 import PaymentStatusPage from './pages/PaymentStatusPage'
@@ -46,7 +47,12 @@ function AppContent() {
   const [path, setPath] = useState(window.location.pathname)
   const firstSegment = path.split('/').filter(Boolean)[0]
   const activeZone: ZoneId = zoneIds.has(firstSegment as ZoneId) ? firstSegment as ZoneId : 'de-eerste-draad'
-  const navigate = (nextPath: string) => { window.history.pushState({}, '', nextPath); setPath(nextPath); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+  const navigate = (nextPath: string) => {
+    window.history.pushState({}, '', nextPath)
+    setPath(nextPath)
+    window.dispatchEvent(new Event('stilte-draad:navigation'))
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   useEffect(() => { const onPopState = () => setPath(window.location.pathname); window.addEventListener('popstate', onPopState); return () => window.removeEventListener('popstate', onPopState) }, [])
   useEffect(() => {
@@ -177,6 +183,7 @@ function AppContent() {
         </div>
       </div>
       <CookieConsent />
+      <AnalyticsTracker />
     </div>
   )
 }

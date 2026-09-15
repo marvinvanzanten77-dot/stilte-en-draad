@@ -32,6 +32,7 @@ const CookieConsent = () => {
     setAnalytics(choice.analytics)
     setMarketing(choice.marketing)
     setSavedChoice(consent)
+    window.dispatchEvent(new Event('consent-updated'))
     if (consent) setOpen(false)
   }
 
@@ -42,7 +43,7 @@ const CookieConsent = () => {
       {details && <div className="mt-5 grid gap-3 rounded-xl bg-[#e7ddc9]/45 p-4 text-sm sm:grid-cols-3">
         <label className="rounded-lg bg-white/35 p-3"><span className="flex items-center justify-between font-medium">Noodzakelijk <input type="checkbox" checked disabled /></span><span className="mt-2 block text-xs leading-5 text-neutral-500">Winkelmand, favorieten en jouw keuze.</span></label>
         <label className="rounded-lg bg-white/35 p-3"><span className="flex items-center justify-between font-medium">Analyse <input type="checkbox" checked={analytics} onChange={(event) => setAnalytics(event.target.checked)} /></span><span className="mt-2 block text-xs leading-5 text-neutral-500">Niet actief; voorbereid voor privacyvriendelijke statistiek.</span></label>
-        <label className="rounded-lg bg-white/35 p-3"><span className="flex items-center justify-between font-medium">Marketing <input type="checkbox" checked={marketing} onChange={(event) => setMarketing(event.target.checked)} /></span><span className="mt-2 block text-xs leading-5 text-neutral-500">Niet actief; geen advertentietracking.</span></label>
+        <label className="rounded-lg bg-white/35 p-3"><span className="flex items-center justify-between font-medium">Marketing <input type="checkbox" checked={marketing} onChange={(event) => setMarketing(event.target.checked)} /></span><span className="mt-2 block text-xs leading-5 text-neutral-500">Pinterest-tracking voor relevante advertenties en conversiemeting.</span></label>
       </div>}
       <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"><button type="button" onClick={() => setDetails((value) => !value)} className="rounded-full px-4 py-2.5 text-[10px] uppercase tracking-[0.14em] underline underline-offset-4">{details ? 'Minder tonen' : 'Zelf instellen'}</button><button type="button" onClick={() => save({ analytics: false, marketing: false })} className="rounded-full border border-neutral-800/20 px-4 py-2.5 text-[10px] uppercase tracking-[0.14em]">Alleen noodzakelijk</button>{details ? <button type="button" onClick={() => save({ analytics, marketing })} className="rounded-full bg-neutral-900 px-4 py-2.5 text-[10px] uppercase tracking-[0.14em] text-white">Voorkeur opslaan</button> : <button type="button" onClick={() => save({ analytics: true, marketing: true })} className="rounded-full bg-neutral-900 px-4 py-2.5 text-[10px] uppercase tracking-[0.14em] text-white">Alles toestaan</button>}</div>
     </div>

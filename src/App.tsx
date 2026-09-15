@@ -18,6 +18,7 @@ import WithdrawalPage from './pages/WithdrawalPage'
 import GlobalCart from './components/GlobalCart'
 import NotFoundPage from './pages/NotFoundPage'
 import { seoForPath } from './data/seo'
+import PinterestTag from './components/PinterestTag'
 
 const zoneIds = new Set(zones.map((zone) => zone.id))
 const pathForZone = (zone: ZoneId) => zone === 'de-eerste-draad' ? '/' : `/${zone}`
@@ -177,6 +178,7 @@ function AppContent() {
         </div>
       </div>
       <CookieConsent />
+      <PinterestTag />
     </div>
   )
 }

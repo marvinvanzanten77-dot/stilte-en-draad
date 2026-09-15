@@ -11,6 +11,12 @@ import { productImage, products } from './src/data/products'
 const escapeHtml = (value: string) => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')
 const jsonForHtml = (value: unknown) => JSON.stringify(value).replaceAll('<', '\\u003c')
 const escapeXml = (value: string) => escapeHtml(value).replaceAll("'", '&apos;')
+const googleProductCategory = (product: { category: string; title: string }) => {
+  if (product.category === 'Tassen') return 'Apparel & Accessories > Handbags, Wallets & Cases > Handbags'
+  if (product.title === 'Zon in Huis') return 'Home & Garden > Decor > Throw Pillows'
+  if (product.category === 'Woontextiel') return 'Home & Garden > Decor > Artwork > Decorative Tapestries'
+  return 'Home & Garden > Decor > Artwork'
+}
 const titleLines = (title: string) => {
   const words = title.split(' ')
   const lines: string[] = []
@@ -85,7 +91,7 @@ const prerenderPlugin = (): Plugin => ({
     }
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${indexableSeoRoutes.map((route) => `  <url><loc>${canonical(route)}</loc><lastmod>${lastmod}</lastmod>${sitemapImages(route)}</url>`).join('\n')}\n</urlset>\n`
     await writeFile(resolve(dist, 'sitemap.xml'), sitemap)
-    const feed = `<?xml version="1.0" encoding="UTF-8"?>\n<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0"><channel><title>Stilte &amp; Draad</title><link>${siteDetails.url}</link><description>Handgemaakte textielwerken van Jannie van Zanten.</description>${merchantProducts.map((product) => `<item><g:id>sd-${product.id}</g:id><g:title>${escapeXml(product.title)}</g:title><g:description>${escapeXml(product.description)}</g:description><g:link>${escapeXml(canonicalProductUrl(product))}</g:link><g:image_link>${escapeXml(absoluteProductImage(product))}</g:image_link><g:price>${product.price.toFixed(2)} EUR</g:price><g:availability>in_stock</g:availability><g:condition>new</g:condition><g:brand>Stilte &amp; Draad</g:brand><g:identifier_exists>no</g:identifier_exists><g:shipping><g:country>NL</g:country><g:service>Verzending binnen Nederland</g:service><g:price>${(SHIPPING_COST_CENTS / 100).toFixed(2)} EUR</g:price></g:shipping><g:custom_label_0>${escapeXml(SOCIAL_STORY_LINE)}</g:custom_label_0></item>`).join('')}</channel></rss>\n`
+    const feed = `<?xml version="1.0" encoding="UTF-8"?>\n<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0"><channel><title>Stilte &amp; Draad</title><link>${siteDetails.url}</link><description>Handgemaakte textielwerken van Jannie van Zanten.</description>${merchantProducts.map((product) => `<item><g:id>sd-${product.id}</g:id><g:title>${escapeXml(product.title)}</g:title><g:description>${escapeXml(product.description)}</g:description><g:link>${escapeXml(canonicalProductUrl(product))}</g:link><g:image_link>${escapeXml(absoluteProductImage(product))}</g:image_link><g:price>${product.price.toFixed(2)} EUR</g:price><g:availability>in_stock</g:availability><g:condition>new</g:condition><g:brand>Stilte &amp; Draad</g:brand><g:identifier_exists>no</g:identifier_exists><g:google_product_category>${escapeXml(googleProductCategory(product))}</g:google_product_category><g:shipping><g:country>NL</g:country><g:service>Verzending binnen Nederland</g:service><g:price>${(SHIPPING_COST_CENTS / 100).toFixed(2)} EUR</g:price></g:shipping><g:custom_label_0>${escapeXml(SOCIAL_STORY_LINE)}</g:custom_label_0></item>`).join('')}</channel></rss>\n`
     await writeFile(resolve(dist, 'google-merchant-feed.xml'), feed)
     await writeFile(resolve(dist, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${siteDetails.url}/sitemap.xml\n`)
   },

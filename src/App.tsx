@@ -164,7 +164,14 @@ function AppContent() {
         <VerticalNav zones={zones} activeZone={activeZone} onSelect={(zone) => navigate(pathForZone(zone))} navigate={navigate} />
         <div className="min-w-0 flex flex-1 flex-col gap-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-            <button type="button" onClick={() => navigate('/')} className="space-y-1 self-start text-left text-sm uppercase tracking-[0.24em] text-neutral-700"><span className="block font-semibold text-neutral-800">STILTE &amp; DRAAD</span><span className="block text-xs font-normal text-neutral-600">door Jannie</span></button>
+            <div className="flex flex-wrap items-start gap-4">
+              <button type="button" onClick={() => navigate('/')} className="space-y-1 self-start text-left text-sm uppercase tracking-[0.24em] text-neutral-700"><span className="block font-semibold text-neutral-800">STILTE &amp; DRAAD</span><span className="block text-xs font-normal text-neutral-600">door Jannie</span></button>
+              <nav aria-label="Sociale media" className="flex flex-wrap gap-1.5 pt-0.5">
+                <a href="https://www.facebook.com/profile.php?id=61594258867306" target="_blank" rel="noreferrer" aria-label="Stilte & Draad op Facebook" title="Facebook" className="rounded-full border border-neutral-800/15 bg-white/45 px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-neutral-600 transition hover:border-neutral-800/30 hover:bg-white/80 hover:text-neutral-900">Facebook</a>
+                <a href="https://www.instagram.com/stilte_en_draad/" target="_blank" rel="noreferrer" aria-label="Stilte & Draad op Instagram" title="Instagram" className="rounded-full border border-neutral-800/15 bg-white/45 px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-neutral-600 transition hover:border-neutral-800/30 hover:bg-white/80 hover:text-neutral-900">Instagram</a>
+                <a href="https://www.pinterest.com/stilteendraad/" target="_blank" rel="noreferrer" aria-label="Stilte & Draad op Pinterest" title="Pinterest" className="rounded-full border border-neutral-800/15 bg-white/45 px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-neutral-600 transition hover:border-neutral-800/30 hover:bg-white/80 hover:text-neutral-900">Pinterest</a>
+              </nav>
+            </div>
             <div className="flex flex-wrap items-center gap-2.5 sm:justify-end">
               <div className="flex items-center gap-2.5 rounded-full border border-white/70 bg-white/65 px-3.5 py-2.5 text-neutral-600 backdrop-blur-sm" role="note" aria-label="Zet je geluid aan voor de beste ervaring">
                 <span aria-hidden="true" className="flex h-7 w-7 items-center justify-center rounded-full border border-neutral-800/15 bg-white/45 text-sm">♫</span>

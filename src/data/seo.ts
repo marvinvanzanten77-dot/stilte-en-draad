@@ -65,10 +65,10 @@ const productPages: SeoRoute[] = products.filter((product) => product.duplicateO
         '@type': 'Offer', priceCurrency: 'EUR', price: product.price.toFixed(2),
         availability: available ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
         itemCondition: 'https://schema.org/NewCondition', seller: { '@id': `${url}/#organisatie` }, url: `${url}${path}`,
-        shippingDetails: { '@type': 'OfferShippingDetails', shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'NL' }, shippingRate: { '@type': 'MonetaryAmount', value: (SHIPPING_COST_CENTS / 100).toFixed(2), currency: 'EUR' }, deliveryTime: { '@type': 'ShippingDeliveryTime', handlingTime: { '@type': 'QuantitativeValue', minValue: 2, maxValue: 5, unitCode: 'DAY' } } },
+        shippingDetails: { '@type': 'OfferShippingDetails', shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'NL' }, shippingRate: { '@type': 'MonetaryAmount', value: (SHIPPING_COST_CENTS / 100).toFixed(2), currency: 'EUR' }, deliveryTime: { '@type': 'ShippingDeliveryTime', handlingTime: { '@type': 'QuantitativeValue', minValue: 2, maxValue: 5, unitCode: 'DAY' }, transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' } } },
         hasMerchantReturnPolicy: { '@type': 'MerchantReturnPolicy', applicableCountry: 'NL', returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow', merchantReturnDays: 14, returnMethod: 'https://schema.org/ReturnByMail', returnFees: 'https://schema.org/ReturnShippingFees' },
       },
-      subjectOf: { '@type': 'ImageObject', contentUrl: absoluteProductImage(product), creator: { '@id': `${url}/#jannie` }, creditText: 'Handwerk door Jannie van Zanten; achtergrond en presentatie kunnen digitaal of met AI zijn bewerkt.', copyrightNotice: `© 2026 ${siteDetails.name}` },
+      subjectOf: { '@type': 'ImageObject', contentUrl: absoluteProductImage(product), creator: { '@id': `${url}/#jannie` }, license: `${url}/algemene-voorwaarden`, acquireLicensePage: `${url}/contact`, creditText: 'Handwerk door Jannie van Zanten; achtergrond en presentatie kunnen digitaal of met AI zijn bewerkt.', copyrightNotice: `© 2026 ${siteDetails.name}` },
     }],
   }
 })
@@ -81,7 +81,7 @@ if (eventsRoute) eventsRoute.structuredData = events.map((event) => ({
   isAccessibleForFree: true, location: { '@type': 'Place', name: event.locationNote, address: { '@type': 'PostalAddress', streetAddress: event.street, addressLocality: event.city, addressCountry: 'NL' } },
   performer: { '@type': 'Person', '@id': `${url}/#jannie`, name: siteDetails.maker },
   organizer: { '@type': 'Organization', '@id': `${url}/#organisatie`, name: siteDetails.name, url },
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR', availability: 'https://schema.org/InStock', url: `${url}/evenementen#${event.id}` },
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR', availability: 'https://schema.org/InStock', validFrom: `${event.date}T00:00:00+02:00`, url: `${url}/evenementen#${event.id}` },
   url: `${url}/evenementen#${event.id}`, image: new URL(event.image, url).href,
 }))
 

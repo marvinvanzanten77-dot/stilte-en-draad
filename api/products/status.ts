@@ -9,7 +9,13 @@ export default async function handler(request: VercelRequest, response: VercelRe
     const raw = Array.isArray(request.query.ids) ? request.query.ids[0] : request.query.ids
     const requested = raw?.split(',').map(Number).filter(Number.isInteger) ?? products.map((product) => product.id)
     const validIds = [...new Set(requested)].filter((id) => products.some((product) => product.id === id)).slice(0, 50)
-    return json(response, 200, { products: await getProductAvailability(validIds) })
+    const inventoryAvailability = await getProductAvailability(validIds)
+    const availability = Object.fromEntries(validIds.map((id) => {
+      const product = products.find((candidate) => candidate.id === id)
+      const soldInCatalog = product?.status === 'verkocht' || product?.readiness === 'sold' || product?.stock === 0
+      return [id, soldInCatalog ? 'sold' : inventoryAvailability[id]]
+    }))
+    return json(response, 200, { products: availability })
   } catch (error) {
     return safeError(response, error)
   }
